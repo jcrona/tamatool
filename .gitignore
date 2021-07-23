@@ -1,2 +1,5 @@
 *.o
-tamatool
+/*/tamatool
+/*/tamatool-*.zip
+build
+linux/dist

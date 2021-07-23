@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=0.1
+Type=Application
+Name=TamaTool Tamagotchi P1 explorer
+GenericName=TamaTool
+Exec=tamatool
+Icon=tamatool.png
+Terminal=false
+Categories=Games;
