@@ -23,7 +23,11 @@
 #include <stdarg.h>
 #include <string.h>
 #include <getopt.h>
+#if defined(__WIN32__)
+#include <windows.h>
+#else
 #include <time.h>
+#endif
 
 #include "SDL.h"
 #include "SDL_image.h"
@@ -99,6 +103,10 @@ static bool_t fast_emulation = 0;
 
 static timestamp_t mem_dump_ts = 0;
 
+#if defined(__WIN32__)
+static LARGE_INTEGER counter_freq;
+#endif
+
 
 static void * hal_malloc(u32_t size)
 {
@@ -137,10 +145,17 @@ static void hal_log(log_level_t level, char *buff, ...)
 
 static timestamp_t hal_get_timestamp(void)
 {
+#if defined(__WIN32__)
+	LARGE_INTEGER count;
+
+	QueryPerformanceCounter(&count);
+	return (count.QuadPart * 1000000)/counter_freq.QuadPart;
+#else
 	struct timespec time;
 
 	clock_gettime(CLOCK_REALTIME, &time);
 	return (time.tv_sec * 1000000 + time.tv_nsec/1000);
+#endif
 }
 
 static void hal_usleep(timestamp_t us)
@@ -486,7 +501,9 @@ static void usage(FILE * fp, int argc, char **argv)
 		"\t-s | --step                   Enable step by step debugging from the start\n"
 		"\t-b | --break <0xXXX>          Add a breakpoint\n"
 		"\t-m | --memory                 Show memory access\n"
+#if defined(__WIN32__)
 		"\t-e | --editor                 Realtime memory editor\n"
+#endif
 		"\t-c | --cpu                    Show CPU related information\n"
 		"\t-v | --verbose                Show all information\n"
 		"\t-h | --help                   Print this message\n",
@@ -519,6 +536,10 @@ int main(int argc, char **argv)
 	bool_t gen_header = 0;
 	bool_t extract_sprites = 0;
 	bool_t modify_sprites = 0;
+
+#if defined(__WIN32__)
+	QueryPerformanceFrequency(&counter_freq);
+#endif
 
 	tamalib_register_hal(&hal);
 
@@ -570,9 +591,11 @@ int main(int argc, char **argv)
 				log_levels |= LOG_MEMORY;
 				break;
 
+#if defined(__WIN32__)
 			case 'e':
 				memory_editor_enable = 1;
 				break;
+#endif
 
 			case 'c':
 				log_levels |= LOG_CPU;

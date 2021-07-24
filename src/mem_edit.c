@@ -17,6 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+#if !defined(__WIN32__)
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -234,3 +235,8 @@ void mem_edit_update(void)
 		}
 	}
 }
+#else
+void mem_edit_reset_terminal(void) {}
+void mem_edit_configure_terminal(void) {}
+void mem_edit_update(void) {}
+#endif

@@ -1,0 +1,25 @@
+id ICON "tamatool.ico"
+1 24 "tamatool.exe.manifest"
+1 VERSIONINFO
+FILEVERSION     0,1,0,0
+PRODUCTVERSION  0,1,0,0
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "080904E4"
+    BEGIN
+      VALUE "CompanyName", "My Company Name"
+      VALUE "FileDescription", "TamaTool Tamagotchi P1 explorer"
+      VALUE "FileVersion", "0.1"
+      VALUE "InternalName", "tamatool"
+      VALUE "LegalCopyright", "Jean-Christophe Rona"
+      VALUE "OriginalFilename", "tamatool.exe"
+      VALUE "ProductName", "TamaTool"
+      VALUE "ProductVersion", "0.1"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x809, 1252
+  END
+END

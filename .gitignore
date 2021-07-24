@@ -2,4 +2,6 @@
 /*/tamatool
 /*/tamatool-*.zip
 build
+tamatool.exe
+windows/dist
 linux/dist
