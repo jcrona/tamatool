@@ -37,52 +37,50 @@ static map_t g_map[MAX_SPRITES];
 
 u12_t * program_load(char *path, uint32_t *size)
 {
-	FILE *f;
+	SDL_RWops *f;
 	uint32_t i;
 	uint8_t buf[2];
 	u12_t *program;
 
-	f = fopen(path, "r");
+	f = SDL_RWFromFile(path, "r");
 	if (f == NULL) {
 		fprintf(stderr, "FATAL: Cannot open ROM \"%s\" !\n", path);
 		return NULL;
 	}
 
-	fseek(f, 0, SEEK_END);
-	*size = ftell(f)/2;
-	fseek(f, 0, SEEK_SET);
+	*size = SDL_RWsize(f)/2;
 
 	//fprintf(stdout, "ROM size is %u * 12bits\n", *size);
 
 	program = (u12_t *) SDL_malloc(*size * sizeof(u12_t));
 	if (program == NULL) {
 		fprintf(stderr, "FATAL: Cannot allocate ROM memory !\n");
-		fclose(f);
+		SDL_RWclose(f);
 		return NULL;
 	}
 
 	for (i = 0; i < *size; i++) {
-		if (fread(buf, 2, 1, f) != 1) {
+		if (SDL_RWread(f, buf, 2, 1) != 1) {
 			fprintf(stderr, "FATAL: Cannot read program from ROM !\n");
 			SDL_free(program);
-			fclose(f);
+			SDL_RWclose(f);
 			return NULL;
 		}
 
 		program[i] = buf[1] | ((buf[0] & 0xF) << 8);
 	}
 
-	fclose(f);
+	SDL_RWclose(f);
 	return program;
 }
 
 void program_save(char *path, u12_t *program, uint32_t size)
 {
-	FILE *f;
+	SDL_RWops *f;
 	uint32_t i;
 	uint8_t buf[2];
 
-	f = fopen(path, "w");
+	f = SDL_RWFromFile(path, "w");
 	if (f == NULL) {
 		fprintf(stderr, "FATAL: Cannot open ROM \"%s\" !\n", path);
 		return;
@@ -92,14 +90,14 @@ void program_save(char *path, u12_t *program, uint32_t size)
 		buf[0] = (program[i] >> 8) & 0xF;
 		buf[1] = program[i] & 0xFF;
 
-		if (fwrite(buf, 2, 1, f) != 1) {
+		if (SDL_RWwrite(f, buf, 2, 1) != 1) {
 			fprintf(stderr, "FATAL: Cannot write program from ROM !\n");
-			fclose(f);
+			SDL_RWclose(f);
 			return;
 		}
 	}
 
-	fclose(f);
+	SDL_RWclose(f);
 }
 
 void program_to_header(u12_t *program, uint32_t size)

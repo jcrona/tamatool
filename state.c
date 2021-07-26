@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#include "SDL.h"
+
 #include "lib/tamalib.h"
 
 #include "state.h"
@@ -33,7 +35,7 @@ static uint32_t find_next_slot(void)
 
 	for (i = 0;; i++) {
 		sprintf(path, STATE_TEMPLATE, i);
-		if (!fopen(path, "r")) {
+		if (!SDL_RWFromFile(path, "r")) {
 			break;
 		}
 	}
@@ -59,7 +61,7 @@ void state_find_last_name(char *path)
 
 void state_save(char *path)
 {
-	FILE *f;
+	SDL_RWops *f;
 	state_t *state;
 	uint8_t buf[4];
 	uint32_t num = 0;
@@ -67,7 +69,7 @@ void state_save(char *path)
 
 	state = tamalib_get_state();
 
-	f = fopen(path, "w");
+	f = SDL_RWFromFile(path, "w");
 	if (f == NULL) {
 		fprintf(stderr, "FATAL: Cannot create state file \"%s\" !\n", path);
 		return;
@@ -76,84 +78,84 @@ void state_save(char *path)
 	/* All fields are written as u8, u16 little-endian or u32 little-endian following the struct order */
 	buf[0] = *(state->pc) & 0xFF;
 	buf[1] = (*(state->pc) >> 8) & 0x1F;
-	num += fwrite(buf, 2, 1, f);
+	num += SDL_RWwrite(f, buf, 2, 1);
 
 	buf[0] = *(state->x) & 0xFF;
 	buf[1] = (*(state->x) >> 8) & 0xF;
-	num += fwrite(buf, 2, 1, f);
+	num += SDL_RWwrite(f, buf, 2, 1);
 
 	buf[0] = *(state->y) & 0xFF;
 	buf[1] = (*(state->y) >> 8) & 0xF;
-	num += fwrite(buf, 2, 1, f);
+	num += SDL_RWwrite(f, buf, 2, 1);
 
 	buf[0] = *(state->a) & 0xF;
-	num += fwrite(buf, 1, 1, f);
+	num += SDL_RWwrite(f, buf, 1, 1);
 
 	buf[0] = *(state->b) & 0xF;
-	num += fwrite(buf, 1, 1, f);
+	num += SDL_RWwrite(f, buf, 1, 1);
 
 	buf[0] = *(state->np) & 0x1F;
-	num += fwrite(buf, 1, 1, f);
+	num += SDL_RWwrite(f, buf, 1, 1);
 
 	buf[0] = *(state->sp) & 0xFF;
-	num += fwrite(buf, 1, 1, f);
+	num += SDL_RWwrite(f, buf, 1, 1);
 
 	buf[0] = *(state->flags) & 0xF;
-	num += fwrite(buf, 1, 1, f);
+	num += SDL_RWwrite(f, buf, 1, 1);
 
 	buf[0] = *(state->clk_timer_timestamp) & 0xFF;
 	buf[1] = (*(state->clk_timer_timestamp) >> 8) & 0xFF;
 	buf[2] = (*(state->clk_timer_timestamp) >> 16) & 0xFF;
 	buf[3] = (*(state->clk_timer_timestamp) >> 24) & 0xFF;
-	num += fwrite(buf, 4, 1, f);
+	num += SDL_RWwrite(f, buf, 4, 1);
 
 	buf[0] = *(state->prog_timer_timestamp) & 0xFF;
 	buf[1] = (*(state->prog_timer_timestamp) >> 8) & 0xFF;
 	buf[2] = (*(state->prog_timer_timestamp) >> 16) & 0xFF;
 	buf[3] = (*(state->prog_timer_timestamp) >> 24) & 0xFF;
-	num += fwrite(buf, 4, 1, f);
+	num += SDL_RWwrite(f, buf, 4, 1);
 
 	buf[0] = *(state->prog_timer_enabled) & 0x1;
-	num += fwrite(buf, 1, 1, f);
+	num += SDL_RWwrite(f, buf, 1, 1);
 
 	buf[0] = *(state->prog_timer_data) & 0xFF;
-	num += fwrite(buf, 1, 1, f);
+	num += SDL_RWwrite(f, buf, 1, 1);
 
 	buf[0] = *(state->prog_timer_rld) & 0xFF;
-	num += fwrite(buf, 1, 1, f);
+	num += SDL_RWwrite(f, buf, 1, 1);
 
 	buf[0] = *(state->call_depth) & 0xFF;
 	buf[1] = (*(state->call_depth) >> 8) & 0xFF;
 	buf[2] = (*(state->call_depth) >> 16) & 0xFF;
 	buf[3] = (*(state->call_depth) >> 24) & 0xFF;
-	num += fwrite(buf, 4, 1, f);
+	num += SDL_RWwrite(f, buf, 4, 1);
 
 	for (i = 0; i < INT_SLOT_NUM; i++) {
 		buf[0] = state->interrupts[i].factor_flag_reg & 0xF;
-		num += fwrite(buf, 1, 1, f);
+		num += SDL_RWwrite(f, buf, 1, 1);
 
 		buf[0] = state->interrupts[i].mask_reg & 0xF;
-		num += fwrite(buf, 1, 1, f);
+		num += SDL_RWwrite(f, buf, 1, 1);
 
 		buf[0] = state->interrupts[i].triggered & 0x1;
-		num += fwrite(buf, 1, 1, f);
+		num += SDL_RWwrite(f, buf, 1, 1);
 	}
 
 	for (i = 0; i < MEMORY_SIZE; i++) {
 		buf[0] = state->memory[i] & 0xF;
-		num += fwrite(buf, 1, 1, f);
+		num += SDL_RWwrite(f, buf, 1, 1);
 	}
 
 	if (num != (14 + INT_SLOT_NUM * 3 + MEMORY_SIZE)) {
 		fprintf(stderr, "FATAL: Failed to write to state file \"%s\" !\n", path);
 	}
 
-	fclose(f);
+	SDL_RWclose(f);
 }
 
 void state_load(char *path)
 {
-	FILE *f;
+	SDL_RWops *f;
 	state_t *state;
 	uint8_t buf[4];
 	uint32_t num = 0;
@@ -161,68 +163,68 @@ void state_load(char *path)
 
 	state = tamalib_get_state();
 
-	f = fopen(path, "r");
+	f = SDL_RWFromFile(path, "r");
 	if (f == NULL) {
 		fprintf(stderr, "FATAL: Cannot open state file \"%s\" !\n", path);
 		return;
 	}
 
 	/* All fields are read as u8, u16 little-endian or u32 little-endian following the struct order */
-	num += fread(buf, 2, 1, f);
+	num += SDL_RWread(f, buf, 2, 1);
 	*(state->pc) = buf[0] | ((buf[1] & 0x1F) << 8);
 
-	num += fread(buf, 2, 1, f);
+	num += SDL_RWread(f, buf, 2, 1);
 	*(state->x) = buf[0] | ((buf[1] & 0xF) << 8);
 
-	num += fread(buf, 2, 1, f);
+	num += SDL_RWread(f, buf, 2, 1);
 	*(state->y) = buf[0] | ((buf[1] & 0xF) << 8);
 
-	num += fread(buf, 1, 1, f);
+	num += SDL_RWread(f, buf, 1, 1);
 	*(state->a) = buf[0] & 0xF;
 
-	num += fread(buf, 1, 1, f);
+	num += SDL_RWread(f, buf, 1, 1);
 	*(state->b) = buf[0] & 0xF;
 
-	num += fread(buf, 1, 1, f);
+	num += SDL_RWread(f, buf, 1, 1);
 	*(state->np) = buf[0] & 0x1F;
 
-	num += fread(buf, 1, 1, f);
+	num += SDL_RWread(f, buf, 1, 1);
 	*(state->sp) = buf[0];
 
-	num += fread(buf, 1, 1, f);
+	num += SDL_RWread(f, buf, 1, 1);
 	*(state->flags) = buf[0] & 0xF;
 
-	num += fread(buf, 4, 1, f);
+	num += SDL_RWread(f, buf, 4, 1);
 	*(state->clk_timer_timestamp) = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
 
-	num += fread(buf, 4, 1, f);
+	num += SDL_RWread(f, buf, 4, 1);
 	*(state->prog_timer_timestamp) = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
 
-	num += fread(buf, 1, 1, f);
+	num += SDL_RWread(f, buf, 1, 1);
 	*(state->prog_timer_enabled) = buf[0] & 0x1;
 
-	num += fread(buf, 1, 1, f);
+	num += SDL_RWread(f, buf, 1, 1);
 	*(state->prog_timer_data) = buf[0];
 
-	num += fread(buf, 1, 1, f);
+	num += SDL_RWread(f, buf, 1, 1);
 	*(state->prog_timer_rld) = buf[0];
 
-	num += fread(buf, 4, 1, f);
+	num += SDL_RWread(f, buf, 4, 1);
 	*(state->call_depth) = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
 
 	for (i = 0; i < INT_SLOT_NUM; i++) {
-		num += fread(buf, 1, 1, f);
+		num += SDL_RWread(f, buf, 1, 1);
 		state->interrupts[i].factor_flag_reg = buf[0] & 0xF;
 
-		num += fread(buf, 1, 1, f);
+		num += SDL_RWread(f, buf, 1, 1);
 		state->interrupts[i].mask_reg = buf[0] & 0xF;
 
-		num += fread(buf, 1, 1, f);
+		num += SDL_RWread(f, buf, 1, 1);
 		state->interrupts[i].triggered = buf[0] & 0x1;
 	}
 
 	for (i = 0; i < MEMORY_SIZE; i++) {
-		num += fread(buf, 1, 1, f);
+		num += SDL_RWread(f, buf, 1, 1);
 		state->memory[i] = buf[0] & 0xF;
 	}
 
@@ -230,5 +232,5 @@ void state_load(char *path)
 		fprintf(stderr, "FATAL: Failed to read from state file \"%s\" !\n", path);
 	}
 
-	fclose(f);
+	SDL_RWclose(f);
 }
