@@ -91,7 +91,7 @@ void program_save(char *path, u12_t *program, uint32_t size)
 		buf[1] = program[i] & 0xFF;
 
 		if (fwrite(buf, 2, 1, f) != 1) {
-			fprintf(stderr, "FATAL: Cannot read program from ROM !\n");
+			fprintf(stderr, "FATAL: Cannot write program from ROM !\n");
 			fclose(f);
 			return;
 		}
