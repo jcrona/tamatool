@@ -37,7 +37,7 @@ u12_t * program_load(char *path, uint32_t *size)
 {
 	FILE *f;
 	uint32_t i;
-	uint8_t buf[3];
+	uint8_t buf[2];
 	u12_t *program;
 
 	f = fopen(path, "r");
@@ -78,7 +78,7 @@ void program_save(char *path, u12_t *program, uint32_t size)
 {
 	FILE *f;
 	uint32_t i;
-	uint8_t buf[3];
+	uint8_t buf[2];
 
 	f = fopen(path, "w");
 	if (f == NULL) {
