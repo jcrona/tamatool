@@ -5,3 +5,4 @@ build
 tamatool.exe
 windows/dist
 linux/dist
+icons/icon-*.*
