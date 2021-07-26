@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#include "SDL.h"
+
 #include "program.h"
 #include "image.h"
 
@@ -52,7 +54,7 @@ u12_t * program_load(char *path, uint32_t *size)
 
 	//fprintf(stdout, "ROM size is %u * 12bits\n", *size);
 
-	program = (u12_t *) malloc(*size * sizeof(u12_t));
+	program = (u12_t *) SDL_malloc(*size * sizeof(u12_t));
 	if (program == NULL) {
 		fprintf(stderr, "FATAL: Cannot allocate ROM memory !\n");
 		fclose(f);
@@ -62,7 +64,7 @@ u12_t * program_load(char *path, uint32_t *size)
 	for (i = 0; i < *size; i++) {
 		if (fread(buf, 2, 1, f) != 1) {
 			fprintf(stderr, "FATAL: Cannot read program from ROM !\n");
-			free(program);
+			SDL_free(program);
 			fclose(f);
 			return NULL;
 		}

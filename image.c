@@ -24,6 +24,8 @@
 #include <getopt.h>
 #include <png.h>
 
+#include "SDL.h"
+
 #include "image.h"
 
 
@@ -31,9 +33,9 @@ void image_alloc(image_t *image)
 {
 	unsigned int y;
 
-	image->row_pointers = (png_bytepp) calloc(sizeof(png_bytep) * image->height, 1);
+	image->row_pointers = (png_bytepp) SDL_calloc(sizeof(png_bytep) * image->height, 1);
 	for (y = 0; y < image->height; y++) {
-		image->row_pointers[y] = (png_byte*) calloc(image->stride, 1);
+		image->row_pointers[y] = (png_byte*) SDL_calloc(image->stride, 1);
 	}
 }
 
@@ -42,9 +44,9 @@ void image_free(image_t *image)
 	unsigned int y;
 
 	for (y = 0; y < image->height; y++) {
-		free(image->row_pointers[y]);
+		SDL_free(image->row_pointers[y]);
 	}
-	free(image->row_pointers);
+	SDL_free(image->row_pointers);
 }
 
 void image_read_file(char* file_name, image_t *image)

@@ -102,12 +102,12 @@ static timestamp_t mem_dump_ts = 0;
 
 static void * hal_malloc(u32_t size)
 {
-	return malloc(size);
+	return SDL_malloc(size);
 }
 
 static void hal_free(void *ptr)
 {
-	free(ptr);
+	SDL_free(ptr);
 }
 
 static void hal_halt(void)
@@ -610,21 +610,21 @@ int main(int argc, char **argv)
 			program_save(rom_path, g_program, g_program_size);
 		}
 
-		free(g_program);
+		SDL_free(g_program);
 		tamalib_free_bp(&g_breakpoints);
 		return 0;
 	}
 
 	if (sdl_init()) {
 		hal_log(LOG_ERROR, "FATAL: Error while initializing application !\n");
-		free(g_program);
+		SDL_free(g_program);
 		tamalib_free_bp(&g_breakpoints);
 		return -1;
 	}
 
 	if (tamalib_init(g_program, g_breakpoints)) {
 		hal_log(LOG_ERROR, "FATAL: Error while initializing tamalib !\n");
-		free(g_program);
+		SDL_free(g_program);
 		tamalib_free_bp(&g_breakpoints);
 		return -1;
 	}
@@ -649,7 +649,7 @@ int main(int argc, char **argv)
 
 	sdl_release();
 
-	free(g_program);
+	SDL_free(g_program);
 
 	tamalib_free_bp(&g_breakpoints);
 
