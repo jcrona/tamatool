@@ -3,7 +3,7 @@
 
 ## Synopsis
 
-TamaTool is a cross-platform Tamagotchi P1 explorer relying on the hardware agnostic Tamagotchi P1 emulation library [TamaLIB](https://github.com/jcrona/tamalib/), and mainly targeting Linux, Windows, MacOS and Android (at the moment, Linux is the only platform supported).
+TamaTool is a cross-platform Tamagotchi P1 explorer relying on the hardware agnostic Tamagotchi P1 emulation library [TamaLIB](https://github.com/jcrona/tamalib/), and mainly targeting Linux, Windows and MacOS.
 
 More than a simple emulator, it is an exploration tool featuring a realtime RAM editor, an ASM debugger, an I/Os monitor and a sprite manipulator, allowing to play around with the Tamagotchi P1 ROM. It also allows to save and restore its emulation state, thus allowing you to backup and share your best friend !
 
@@ -11,8 +11,20 @@ More than a simple emulator, it is an exploration tool featuring a realtime RAM 
 
 In order to create the background image used in TamaTool, I scanned the background of my own P1, that I filtered/enhanced using GIMP. The original scan be found in the __res__ folder.
 
+__Notes regarding the supported platforms__
+The Windows build does not include the realtime memory editor. The ASM debugger and I/Os monitor do work, but the emulation is very slow when they are enabled because of the poor console performances.
+Android support would be feasible, but a native implementation of TamaLIB without libSDL2 would probably be more efficient.
 
 ## Build instruction
+
+First, you need to clone TamaTool and its submodule:
+```
+$ git clone --recursive https://github.com/jcrona/tamatool.git
+```
+
+Then the instructions depend on the targetted platform.
+
+### Linux (or other Unix environment providing the dependencies as system libraries)
 
 TamaTool depends on libSDL2, libSDL2-image and libpng.
 On Ubuntu, you can install those libraries using the following command:
@@ -20,15 +32,38 @@ On Ubuntu, you can install those libraries using the following command:
 $ sudo apt-get install libsdl2-dev libsdl2-image-dev libpng-dev
 ```
 
-You can now clone TamaTool and its submodule:
+Then you can build a distribution package (no library bundled) with:
 ```
-$ git clone --recursive https://github.com/jcrona/tamatool.git
+$ make linux
 ```
 
-Then you can build as usual with:
+The package will be available in the __linux__ folder.
+
+### Windows
+
+Only cross-compiling from linux using MinGW64 is supported. The required dependencies are provided as prebuilt binaries.
+On Ubuntu you can install MinGW64 using the following command:
 ```
-$ make
+$ sudo apt install gcc-mingw-w64
 ```
+
+Then you can build a distribution package (with the required libraries bundled) with:
+```
+$ make windows
+```
+
+The package will be available in the __windows__ folder.
+
+### MacOS
+
+TamaTool needs to be built on MacOS. The required dependencies are provided as prebuilt binaries.
+You can build a distribution package (with the required libraries bundled) with:
+```
+$ make mac
+```
+
+The package will be available in the __mac__ folder.
+
 
 ## Usage
 
