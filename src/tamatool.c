@@ -81,6 +81,12 @@
 #define AUDIO_SAMPLES			480 // 10 ms @ 48000 Hz
 #define AUDIO_VOLUME			0.2f
 
+typedef enum {
+	SPEED_UNLIMITED = 0,
+	SPEED_1X = 1,
+	SPEED_10X = 10,
+} emulation_speed_t;
+
 static breakpoint_t *g_breakpoints = NULL;
 
 static u12_t *g_program = NULL;		// The actual program that is executed
@@ -106,7 +112,7 @@ static bool_t icon_buffer[ICON_NUM] = {0};
 
 static u8_t log_levels = LOG_ERROR | LOG_INFO;
 
-static bool_t fast_emulation = 0;
+static emulation_speed_t speed = SPEED_1X;
 
 static timestamp_t mem_dump_ts = 0;
 
@@ -316,8 +322,21 @@ static int handle_sdl_events(SDL_Event *event)
 					break;
 
 				case SDLK_f:
-					fast_emulation = !fast_emulation;
-					tamalib_set_speed(fast_emulation ? 10 : 1);
+					switch (speed) {
+						case SPEED_1X:
+							speed = SPEED_10X;
+							break;
+
+						case SPEED_10X:
+							speed = SPEED_UNLIMITED;
+							break;
+
+						case SPEED_UNLIMITED:
+							speed = SPEED_1X;
+							break;
+					}
+
+					tamalib_set_speed((u8_t) speed);
 					break;
 
 				case SDLK_b:
