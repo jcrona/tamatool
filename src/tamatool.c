@@ -52,26 +52,27 @@
 #define ROM_NOT_FOUND_TITLE		"Tamagotchi ROM not found"
 #define ROM_NOT_FOUND_MSG		"You need to place a Tamagotchi P1 ROM called \"rom.bin\" inside TamaTool's folder/package first !"
 
-#define WINDOW_WIDTH			321
-#define WINDOW_HEIGHT			321
+#define DEFAULT_WINDOW_SIZE		321
 
-#define LCD_OFFSET_X			1
-#define LCD_OFFSET_Y			82
+#define DEFAULT_LCD_OFFSET_X		1
+#define DEFAULT_LCD_OFFSET_Y		82
 
 #define ICON_NUM			8
 #define ICON_SRC_SIZE			64
-#define ICON_DEST_SIZE			64
-#define ICON_DEST_OFFSET_X		25
-#define ICON_DEST_OFFSET_Y		14
-#define ICON_DEST_STRIDE_X		71
-#define ICON_DEST_STRIDE_Y		242
+#define DEFAULT_ICON_DEST_SIZE		64
+#define DEFAULT_ICON_OFFSET_X		25
+#define DEFAULT_ICON_OFFSET_Y		14
+#define DEFAULT_ICON_STRIDE_X		71
+#define DEFAULT_ICON_STRIDE_Y		242
 
-#define PIXEL_SIZE			9
-#define PIXEL_PADDING			1
-#define PIXEL_STRIDE			(PIXEL_SIZE + PIXEL_PADDING)
+#define DEFAULT_PIXEL_STRIDE		10
+#define DEFAULT_PIXEL_PADDING		1
 
-#define PIXEL_ALPHA_ON			255
-#define PIXEL_ALPHA_OFF			20
+#define DEFAULT_LCD_ALPHA_ON		255
+#define DEFAULT_LCD_ALPHA_OFF		20
+
+#define PIXEL_STRIDE_MIN		1
+#define PIXEL_STRIDE_MAX		30
 
 #define RES_PATH			"./res"
 #define BACKGROUND_PATH			RES_PATH"/background.png"
@@ -116,9 +117,16 @@ static emulation_speed_t speed = SPEED_1X;
 
 static timestamp_t mem_dump_ts = 0;
 
+static uint16_t pixel_stride = DEFAULT_PIXEL_STRIDE;
+static uint16_t window_size, lcd_offset_x, lcd_offset_y, icon_dest_size, icon_offset_x, icon_offset_y, icon_stride_x, icon_stride_y, pixel_size;
+static uint16_t pixel_alpha_on, pixel_alpha_off, icon_alpha_on, icon_alpha_off;
+
 #if defined(__WIN32__)
 static LARGE_INTEGER counter_freq;
 #endif
+
+static void sdl_release(void);
+static bool_t sdl_init(void);
 
 
 static void * hal_malloc(u32_t size)
@@ -191,15 +199,15 @@ static void hal_update_screen(void)
 	/* Dot matrix */
 	for (j = 0; j < LCD_HEIGTH; j++) {
 		for (i = 0; i < LCD_WIDTH; i++) {
-			r.w = PIXEL_SIZE;
-			r.h = PIXEL_SIZE;
-			r.x = i * PIXEL_STRIDE + LCD_OFFSET_X;
-			r.y = j * PIXEL_STRIDE + LCD_OFFSET_Y;
+			r.w = pixel_size;
+			r.h = pixel_size;
+			r.x = i * pixel_stride + lcd_offset_x;
+			r.y = j * pixel_stride + lcd_offset_y;
 
 			if (matrix_buffer[j][i]) {
-				SDL_SetRenderDrawColor(renderer, 0, 0, 128, PIXEL_ALPHA_ON);
+				SDL_SetRenderDrawColor(renderer, 0, 0, 128, pixel_alpha_on);
 			} else {
-				SDL_SetRenderDrawColor(renderer, 0, 0, 128, PIXEL_ALPHA_OFF);
+				SDL_SetRenderDrawColor(renderer, 0, 0, 128, pixel_alpha_off);
 			}
 
 			SDL_RenderFillRect(renderer, &r);
@@ -213,17 +221,17 @@ static void hal_update_screen(void)
 		src_icon_r.x = (i % 4) * ICON_SRC_SIZE;
 		src_icon_r.y = (i / 4) * ICON_SRC_SIZE;
 
-		dest_icon_r.w = ICON_DEST_SIZE;
-		dest_icon_r.h = ICON_DEST_SIZE;
-		dest_icon_r.x = (i % 4) * ICON_DEST_STRIDE_X + ICON_DEST_OFFSET_X;
-		dest_icon_r.y = (i / 4) * ICON_DEST_STRIDE_Y + ICON_DEST_OFFSET_Y;
+		dest_icon_r.w = icon_dest_size;
+		dest_icon_r.h = icon_dest_size;
+		dest_icon_r.x = (i % 4) * icon_stride_x + icon_offset_x;
+		dest_icon_r.y = (i / 4) * icon_stride_y + icon_offset_y;
 
 
 		SDL_SetTextureColorMod(icons, 0, 0, 128);
 		if (icon_buffer[i]) {
-			SDL_SetTextureAlphaMod(icons, PIXEL_ALPHA_ON);
+			SDL_SetTextureAlphaMod(icons, icon_alpha_on);
 		} else {
-			SDL_SetTextureAlphaMod(icons, PIXEL_ALPHA_OFF);
+			SDL_SetTextureAlphaMod(icons, icon_alpha_off);
 		}
 
 		SDL_RenderCopy(renderer, icons, &src_icon_r, &dest_icon_r);
@@ -255,6 +263,26 @@ static void hal_play_frequency(bool_t en)
 	if (is_audio_playing != en) {
 		is_audio_playing = en;
 	}
+}
+
+static void compute_layout(uint8_t stride)
+{
+	pixel_stride = stride;
+	pixel_size = pixel_stride - pixel_stride/10;
+
+	window_size = pixel_stride * (LCD_WIDTH + 1) - pixel_size;
+	lcd_offset_x = pixel_stride - pixel_size;
+	lcd_offset_y = (window_size * DEFAULT_LCD_OFFSET_Y)/DEFAULT_WINDOW_SIZE;
+	icon_dest_size = (window_size * DEFAULT_ICON_DEST_SIZE)/DEFAULT_WINDOW_SIZE;
+	icon_offset_x = (window_size * DEFAULT_ICON_OFFSET_X)/DEFAULT_WINDOW_SIZE;
+	icon_offset_y = (window_size * DEFAULT_ICON_OFFSET_Y)/DEFAULT_WINDOW_SIZE;
+	icon_stride_x = (window_size * DEFAULT_ICON_STRIDE_X)/DEFAULT_WINDOW_SIZE;
+	icon_stride_y = (window_size * DEFAULT_ICON_STRIDE_Y)/DEFAULT_WINDOW_SIZE;
+
+	pixel_alpha_on = DEFAULT_LCD_ALPHA_ON;
+	pixel_alpha_off = (pixel_size != pixel_stride) ? DEFAULT_LCD_ALPHA_OFF : 0;
+	icon_alpha_on = DEFAULT_LCD_ALPHA_ON;
+	icon_alpha_off = DEFAULT_LCD_ALPHA_OFF;
 }
 
 static int handle_sdl_events(SDL_Event *event)
@@ -351,6 +379,26 @@ static int handle_sdl_events(SDL_Event *event)
 					}
 					break;
 
+				case SDLK_i:
+					if (pixel_stride >= PIXEL_STRIDE_MAX) {
+						break;
+					}
+
+					sdl_release();
+					compute_layout(++pixel_stride);
+					sdl_init();
+					break;
+
+				case SDLK_d:
+					if (pixel_stride <= PIXEL_STRIDE_MIN) {
+						break;
+					}
+
+					sdl_release();
+					compute_layout(--pixel_stride);
+					sdl_init();
+					break;
+
 				case SDLK_LEFT:
 					tamalib_set_button(BTN_LEFT, BTN_STATE_PRESSED);
 					break;
@@ -358,7 +406,6 @@ static int handle_sdl_events(SDL_Event *event)
 				case SDLK_DOWN:
 					tamalib_set_button(BTN_MIDDLE, BTN_STATE_PRESSED);
 					break;
-
 
 				case SDLK_RIGHT:
 					tamalib_set_button(BTN_RIGHT, BTN_STATE_PRESSED);
@@ -469,7 +516,7 @@ static bool_t sdl_init(void)
 		return 1;
 	}
 
-	window = SDL_CreateWindow(APP_NAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+	window = SDL_CreateWindow(APP_NAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_size, window_size, SDL_WINDOW_SHOWN);
 
 	renderer =  SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
@@ -491,8 +538,8 @@ static bool_t sdl_init(void)
 
 	bg_rect.x = 0;
 	bg_rect.y = 0;
-	bg_rect.w = WINDOW_WIDTH;
-	bg_rect.h = WINDOW_HEIGHT;
+	bg_rect.w = window_size;
+	bg_rect.h = window_size;
 
 	SDL_memset(&audio_spec, 0, sizeof(audio_spec));
 	audio_spec.freq = AUDIO_FREQUENCY;
@@ -675,6 +722,8 @@ int main(int argc, char **argv)
 		tamalib_free_bp(&g_breakpoints);
 		return 0;
 	}
+
+	compute_layout(pixel_stride);
 
 	if (sdl_init()) {
 		hal_log(LOG_ERROR, "FATAL: Error while initializing application !\n");
