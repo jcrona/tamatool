@@ -23,10 +23,14 @@
 #include <stdarg.h>
 #include <string.h>
 #include <getopt.h>
+#if !defined(__WIN32__)
+#include <time.h>
+#endif
+
 #if defined(__WIN32__)
 #include <windows.h>
-#else
-#include <time.h>
+#elif defined(__APPLE__)
+#include <CoreFoundation/CoreFoundation.h>
 #endif
 
 #include "SDL.h"
@@ -44,6 +48,9 @@
 #define AUTHOR_NAME			"Jean-Christophe Rona"
 
 #define ROM_PATH			"rom.bin"
+
+#define ROM_NOT_FOUND_TITLE		"Tamagotchi ROM not found"
+#define ROM_NOT_FOUND_MSG		"You need to place a Tamagotchi P1 ROM called \"rom.bin\" inside TamaTool's folder/package first !"
 
 #define WINDOW_WIDTH			321
 #define WINDOW_HEIGHT			321
@@ -487,6 +494,17 @@ static bool_t sdl_init(void)
 	return 0;
 }
 
+void rom_not_found_msg(void)
+{
+#if defined(__WIN32__)
+	MessageBox(NULL, ROM_NOT_FOUND_MSG, ROM_NOT_FOUND_TITLE, MB_OK);
+#elif defined(__APPLE__)
+	CFUserNotificationDisplayNotice(0, kCFUserNotificationStopAlertLevel, NULL, NULL, NULL, CFSTR(ROM_NOT_FOUND_TITLE), CFSTR(ROM_NOT_FOUND_MSG), NULL);
+#else
+	fprintf(stderr, ROM_NOT_FOUND_TITLE": "ROM_NOT_FOUND_MSG"\n");
+#endif
+}
+
 static void usage(FILE * fp, int argc, char **argv)
 {
 	fprintf(fp,
@@ -619,6 +637,7 @@ int main(int argc, char **argv)
 	if (g_program == NULL) {
 		hal_log(LOG_ERROR, "FATAL: Error while loading ROM %s !\n", rom_path);
 		tamalib_free_bp(&g_breakpoints);
+		rom_not_found_msg();
 		return -1;
 	}
 

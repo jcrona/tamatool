@@ -23,7 +23,7 @@ WRAPPER_SCRIPT = tamatool.mac
 RES_PATH = ../res
 
 CFLAGS += -I$(SDL_ROOT)/include/SDL2 -I$(SDL_IMAGE_ROOT)/include/SDL2 -I$(LIBPNG_ROOT)/include -Wall
-LDLIBS = -L$(SDL_ROOT)/lib -L$(SDL_IMAGE_ROOT)/lib -L$(LIBPNG_ROOT)/lib -lSDL2main -lSDL2 -lSDL2_image -lpng16
+LDLIBS = -L$(SDL_ROOT)/lib -L$(SDL_IMAGE_ROOT)/lib -L$(LIBPNG_ROOT)/lib -lSDL2main -lSDL2 -lSDL2_image -lpng16 -framework CoreFoundation
 
 include ../src/common.mk
 
