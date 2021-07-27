@@ -666,6 +666,7 @@ int main(int argc, char **argv)
 
 	if (tamalib_init(g_program, g_breakpoints)) {
 		hal_log(LOG_ERROR, "FATAL: Error while initializing tamalib !\n");
+		sdl_release();
 		SDL_free(g_program);
 		tamalib_free_bp(&g_breakpoints);
 		return -1;
