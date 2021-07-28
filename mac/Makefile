@@ -11,8 +11,10 @@ SDL_LIB = $(SDL_ROOT)/lib/libSDL2-2.0.0.dylib
 SDL_IMAGE_LIB = $(SDL_IMAGE_ROOT)/lib/libSDL2_image-2.0.0.dylib
 LIBPNG_LIB = $(SDL_IMAGE_ROOT)/lib/libpng16.16.dylib
 
+VERSION = $(shell git describe --tags --always --dirty)
+
 DIST_PATH = dist
-DIST_FILE = tamatool-mac.zip
+DIST_FILE = tamatool-mac-$(VERSION).zip
 
 APP_NAME = TamaTool.app
 PLIST_FILE = Info.plist

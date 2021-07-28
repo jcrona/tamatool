@@ -22,8 +22,10 @@ SDL_IMAGE_LIB = $(SDL_IMAGE_ROOT)/bin/SDL2_image.dll
 LIBPNG_LIB = $(SDL_IMAGE_ROOT)/bin/libpng16-16.dll
 ZLIB_LIB = $(SDL_IMAGE_ROOT)/bin/zlib1.dll
 
+VERSION = $(shell git describe --tags --always --dirty)
+
 DIST_PATH = dist
-DIST_FILE = tamatool-win$(WIN_ARCH).zip
+DIST_FILE = tamatool-win$(WIN_ARCH)-$(VERSION).zip
 
 RES_PATH = ../res
 

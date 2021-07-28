@@ -6,8 +6,10 @@ LD=$(GNU_PREFIX)ld
 DESKTOP_FILE = tamatool.desktop
 ICON_FILE = tamatool.png
 
+VERSION = $(shell git describe --tags --always --dirty)
+
 DIST_PATH = dist
-DIST_FILE = tamatool-linux.zip
+DIST_FILE = tamatool-linux-$(VERSION).zip
 
 RES_PATH = ../res
 
