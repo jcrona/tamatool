@@ -72,6 +72,11 @@
 #define REF_ICON_STRIDE_X		71
 #define REF_ICON_STRIDE_Y		242
 
+#define REF_BUTTONS_X			182
+#define REF_BUTTONS_Y			716
+#define REF_BUTTONS_WIDTH		278
+#define REF_BUTTONS_HEIGHT		88
+
 #define REF_PIXEL_PADDING		1
 
 #define DEFAULT_PIXEL_STRIDE		10
@@ -132,6 +137,7 @@ static uint16_t pixel_stride = DEFAULT_PIXEL_STRIDE;
 static uint16_t shell_width, shell_height, bg_offset_x, bg_offset_y; // Offsets are relative to the shell (0, 0)
 static uint16_t bg_size, lcd_offset_x, lcd_offset_y, icon_dest_size, icon_offset_x, icon_offset_y, icon_stride_x, icon_stride_y, pixel_size; // Offsets are relative to the background (bg_offset_x, bg_offset_y)
 static uint16_t pixel_alpha_on, pixel_alpha_off, icon_alpha_on, icon_alpha_off;
+static uint16_t buttons_x, buttons_y, buttons_width, buttons_height;
 static bool_t shell_enable = 1;
 
 #if defined(__WIN32__)
@@ -315,6 +321,28 @@ static void compute_layout(void)
 	pixel_alpha_off = (pixel_size != pixel_stride) ? DEFAULT_LCD_ALPHA_OFF : 0;
 	icon_alpha_on = DEFAULT_LCD_ALPHA_ON;
 	icon_alpha_off = DEFAULT_LCD_ALPHA_OFF;
+
+	buttons_x = (lcd_size * REF_BUTTONS_X)/REF_LCD_SIZE;
+	buttons_y = (lcd_size * REF_BUTTONS_Y)/REF_LCD_SIZE;
+	buttons_width = (lcd_size * REF_BUTTONS_WIDTH)/REF_LCD_SIZE;
+	buttons_height = (lcd_size * REF_BUTTONS_HEIGHT)/REF_LCD_SIZE;
+}
+
+static void handle_click(int32_t x, int32_t y, uint8_t pressed) {
+	if (y >= buttons_y && y < buttons_y + buttons_height) {
+		if (x < buttons_x) {
+			/* Nothing */
+		} else if (x < buttons_x + buttons_width/3) {
+			/* Left button */
+			tamalib_set_button(BTN_LEFT, pressed ? BTN_STATE_PRESSED : BTN_STATE_RELEASED);
+		} else if (x < buttons_x + (buttons_width * 2)/3) {
+			/* Middle button */
+			tamalib_set_button(BTN_MIDDLE, pressed ? BTN_STATE_PRESSED : BTN_STATE_RELEASED);
+		} else if (x < buttons_x + buttons_width) {
+			/* Right button */
+			tamalib_set_button(BTN_RIGHT, pressed ? BTN_STATE_PRESSED : BTN_STATE_RELEASED);
+		}
+	}
 }
 
 static int handle_sdl_events(SDL_Event *event)
@@ -335,6 +363,7 @@ static int handle_sdl_events(SDL_Event *event)
 		case SDL_MOUSEBUTTONDOWN:
 			switch (event->button.button) {
 				case SDL_BUTTON_LEFT:
+					handle_click(event->button.x, event->button.y, 1);
 					break;
 
 				case SDL_BUTTON_RIGHT:
@@ -348,6 +377,7 @@ static int handle_sdl_events(SDL_Event *event)
 		case SDL_MOUSEBUTTONUP:
 			switch (event->button.button) {
 				case SDL_BUTTON_LEFT:
+					handle_click(event->button.x, event->button.y, 0);
 					break;
 
 				case SDL_BUTTON_RIGHT:
