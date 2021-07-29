@@ -52,16 +52,17 @@
 #define ROM_NOT_FOUND_TITLE		"Tamagotchi ROM not found"
 #define ROM_NOT_FOUND_MSG		"You need to place a Tamagotchi P1 ROM called \"rom.bin\" inside TamaTool's folder/package first !"
 
-#define DEFAULT_WINDOW_SIZE		321
+#define DEFAULT_WINDOW_SIZE		345
 
-#define DEFAULT_LCD_OFFSET_X		1
-#define DEFAULT_LCD_OFFSET_Y		82
+#define DEFAULT_LCD_SIZE		321
+#define DEFAULT_LCD_OFFSET_X		12
+#define DEFAULT_LCD_OFFSET_Y		93
 
 #define ICON_NUM			8
 #define ICON_SRC_SIZE			64
 #define DEFAULT_ICON_DEST_SIZE		64
-#define DEFAULT_ICON_OFFSET_X		25
-#define DEFAULT_ICON_OFFSET_Y		14
+#define DEFAULT_ICON_OFFSET_X		35
+#define DEFAULT_ICON_OFFSET_Y		25
 #define DEFAULT_ICON_STRIDE_X		71
 #define DEFAULT_ICON_STRIDE_Y		242
 
@@ -267,17 +268,20 @@ static void hal_play_frequency(bool_t en)
 
 static void compute_layout(uint8_t stride)
 {
+	uint16_t lcd_size;
+
 	pixel_stride = stride;
 	pixel_size = pixel_stride - pixel_stride/10;
+	lcd_size = pixel_stride * (LCD_WIDTH + 1) - pixel_size;
 
-	window_size = pixel_stride * (LCD_WIDTH + 1) - pixel_size;
-	lcd_offset_x = pixel_stride - pixel_size;
-	lcd_offset_y = (window_size * DEFAULT_LCD_OFFSET_Y)/DEFAULT_WINDOW_SIZE;
-	icon_dest_size = (window_size * DEFAULT_ICON_DEST_SIZE)/DEFAULT_WINDOW_SIZE;
-	icon_offset_x = (window_size * DEFAULT_ICON_OFFSET_X)/DEFAULT_WINDOW_SIZE;
-	icon_offset_y = (window_size * DEFAULT_ICON_OFFSET_Y)/DEFAULT_WINDOW_SIZE;
-	icon_stride_x = (window_size * DEFAULT_ICON_STRIDE_X)/DEFAULT_WINDOW_SIZE;
-	icon_stride_y = (window_size * DEFAULT_ICON_STRIDE_Y)/DEFAULT_WINDOW_SIZE;
+	window_size = (lcd_size * DEFAULT_WINDOW_SIZE)/DEFAULT_LCD_SIZE;
+	lcd_offset_x = (lcd_size * DEFAULT_LCD_OFFSET_X)/DEFAULT_LCD_SIZE + pixel_stride - pixel_size;
+	lcd_offset_y = (lcd_size * DEFAULT_LCD_OFFSET_Y)/DEFAULT_LCD_SIZE;
+	icon_dest_size = (lcd_size * DEFAULT_ICON_DEST_SIZE)/DEFAULT_LCD_SIZE;
+	icon_offset_x = (lcd_size * DEFAULT_ICON_OFFSET_X)/DEFAULT_LCD_SIZE;
+	icon_offset_y = (lcd_size * DEFAULT_ICON_OFFSET_Y)/DEFAULT_LCD_SIZE;
+	icon_stride_x = (lcd_size * DEFAULT_ICON_STRIDE_X)/DEFAULT_LCD_SIZE;
+	icon_stride_y = (lcd_size * DEFAULT_ICON_STRIDE_Y)/DEFAULT_LCD_SIZE;
 
 	pixel_alpha_on = DEFAULT_LCD_ALPHA_ON;
 	pixel_alpha_off = (pixel_size != pixel_stride) ? DEFAULT_LCD_ALPHA_OFF : 0;
