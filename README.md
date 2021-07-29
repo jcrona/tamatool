@@ -9,7 +9,7 @@ More than a simple emulator, it is an exploration tool featuring a realtime RAM 
 
 ![TamaTool](misc/screenshot.png)
 
-In order to create the background image used in TamaTool, I scanned the background of my own P1, that I filtered/enhanced using GIMP. The original scan be found in the __res__ folder.
+In order to create the background image used in TamaTool, I scanned the background of my own P1, that I filtered/enhanced using GIMP. The original scan be found in the __misc__ folder.
 
 __Notes regarding the supported platforms__
 The Windows build does not include the realtime memory editor. The ASM debugger and I/Os monitor do work, but the emulation is very slow when they are enabled because of the poor console performances.
