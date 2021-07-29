@@ -52,33 +52,35 @@
 #define ROM_NOT_FOUND_TITLE		"Tamagotchi ROM not found"
 #define ROM_NOT_FOUND_MSG		"You need to place a Tamagotchi P1 ROM called \"rom.bin\" inside TamaTool's folder/package first !"
 
-#define DEFAULT_BACKGROUND_SIZE		345
-#define DEFAULT_BACKGROUND_OFFSET_X	148
-#define DEFAULT_BACKGROUND_OFFSET_Y	284
+#define REF_BACKGROUND_SIZE		345
+#define REF_BACKGROUND_OFFSET_X		148
+#define REF_BACKGROUND_OFFSET_Y		284
 
-#define DEFAULT_SHELL_WIDTH		634
-#define DEFAULT_SHELL_HEIGHT		816
+#define REF_SHELL_WIDTH			634
+#define REF_SHELL_HEIGHT		816
 
-#define DEFAULT_LCD_SIZE		321
-#define DEFAULT_LCD_OFFSET_X		12
-#define DEFAULT_LCD_OFFSET_Y		93
+#define REF_LCD_SIZE			321
+#define REF_LCD_OFFSET_X		12
+#define REF_LCD_OFFSET_Y		93
 
 #define ICON_NUM			8
 #define ICON_SRC_SIZE			64
-#define DEFAULT_ICON_DEST_SIZE		64
-#define DEFAULT_ICON_OFFSET_X		35
-#define DEFAULT_ICON_OFFSET_Y		25
-#define DEFAULT_ICON_STRIDE_X		71
-#define DEFAULT_ICON_STRIDE_Y		242
+
+#define REF_ICON_DEST_SIZE		64
+#define REF_ICON_OFFSET_X		35
+#define REF_ICON_OFFSET_Y		25
+#define REF_ICON_STRIDE_X		71
+#define REF_ICON_STRIDE_Y		242
+
+#define REF_PIXEL_PADDING		1
 
 #define DEFAULT_PIXEL_STRIDE		10
-#define DEFAULT_PIXEL_PADDING		1
-
-#define DEFAULT_LCD_ALPHA_ON		255
-#define DEFAULT_LCD_ALPHA_OFF		20
 
 #define PIXEL_STRIDE_MIN		1
 #define PIXEL_STRIDE_MAX		30
+
+#define DEFAULT_LCD_ALPHA_ON		255
+#define DEFAULT_LCD_ALPHA_OFF		20
 
 #define RES_PATH			"./res"
 #define BACKGROUND_PATH			RES_PATH"/background.png"
@@ -285,14 +287,14 @@ static void compute_layout(void)
 	pixel_size = pixel_stride - pixel_stride/10;
 	lcd_size = pixel_stride * (LCD_WIDTH + 1) - pixel_size;
 
-	bg_size = (lcd_size * DEFAULT_BACKGROUND_SIZE)/DEFAULT_LCD_SIZE;
+	bg_size = (lcd_size * REF_BACKGROUND_SIZE)/REF_LCD_SIZE;
 
 	if (shell_enable) {
-		bg_offset_x = (lcd_size * DEFAULT_BACKGROUND_OFFSET_X)/DEFAULT_LCD_SIZE;
-		bg_offset_y = (lcd_size * DEFAULT_BACKGROUND_OFFSET_Y)/DEFAULT_LCD_SIZE;
+		bg_offset_x = (lcd_size * REF_BACKGROUND_OFFSET_X)/REF_LCD_SIZE;
+		bg_offset_y = (lcd_size * REF_BACKGROUND_OFFSET_Y)/REF_LCD_SIZE;
 
-		shell_width = (lcd_size * DEFAULT_SHELL_WIDTH)/DEFAULT_LCD_SIZE;
-		shell_height = (lcd_size * DEFAULT_SHELL_HEIGHT)/DEFAULT_LCD_SIZE;
+		shell_width = (lcd_size * REF_SHELL_WIDTH)/REF_LCD_SIZE;
+		shell_height = (lcd_size * REF_SHELL_HEIGHT)/REF_LCD_SIZE;
 	} else {
 		bg_offset_x = 0;
 		bg_offset_y = 0;
@@ -301,13 +303,13 @@ static void compute_layout(void)
 		shell_height = 0;
 	}
 
-	lcd_offset_x = (lcd_size * DEFAULT_LCD_OFFSET_X)/DEFAULT_LCD_SIZE + pixel_stride - pixel_size;
-	lcd_offset_y = (lcd_size * DEFAULT_LCD_OFFSET_Y)/DEFAULT_LCD_SIZE;
-	icon_dest_size = (lcd_size * DEFAULT_ICON_DEST_SIZE)/DEFAULT_LCD_SIZE;
-	icon_offset_x = (lcd_size * DEFAULT_ICON_OFFSET_X)/DEFAULT_LCD_SIZE;
-	icon_offset_y = (lcd_size * DEFAULT_ICON_OFFSET_Y)/DEFAULT_LCD_SIZE;
-	icon_stride_x = (lcd_size * DEFAULT_ICON_STRIDE_X)/DEFAULT_LCD_SIZE;
-	icon_stride_y = (lcd_size * DEFAULT_ICON_STRIDE_Y)/DEFAULT_LCD_SIZE;
+	lcd_offset_x = (lcd_size * REF_LCD_OFFSET_X)/REF_LCD_SIZE + pixel_stride - pixel_size;
+	lcd_offset_y = (lcd_size * REF_LCD_OFFSET_Y)/REF_LCD_SIZE;
+	icon_dest_size = (lcd_size * REF_ICON_DEST_SIZE)/REF_LCD_SIZE;
+	icon_offset_x = (lcd_size * REF_ICON_OFFSET_X)/REF_LCD_SIZE;
+	icon_offset_y = (lcd_size * REF_ICON_OFFSET_Y)/REF_LCD_SIZE;
+	icon_stride_x = (lcd_size * REF_ICON_STRIDE_X)/REF_LCD_SIZE;
+	icon_stride_y = (lcd_size * REF_ICON_STRIDE_Y)/REF_LCD_SIZE;
 
 	pixel_alpha_on = DEFAULT_LCD_ALPHA_ON;
 	pixel_alpha_off = (pixel_size != pixel_stride) ? DEFAULT_LCD_ALPHA_OFF : 0;
