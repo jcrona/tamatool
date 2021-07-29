@@ -104,7 +104,7 @@ void program_to_header(u12_t *program, uint32_t size)
 {
 	uint32_t i;
 
-	fprintf(stdout, "static u12_t program[] = {");
+	fprintf(stdout, "static const u12_t program[] = {");
 
 	for (i = 0; i < size; i++) {
 		if (!(i % 16)) {
