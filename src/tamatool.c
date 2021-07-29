@@ -52,7 +52,12 @@
 #define ROM_NOT_FOUND_TITLE		"Tamagotchi ROM not found"
 #define ROM_NOT_FOUND_MSG		"You need to place a Tamagotchi P1 ROM called \"rom.bin\" inside TamaTool's folder/package first !"
 
-#define DEFAULT_WINDOW_SIZE		345
+#define DEFAULT_BACKGROUND_SIZE		345
+#define DEFAULT_BACKGROUND_OFFSET_X	148
+#define DEFAULT_BACKGROUND_OFFSET_Y	284
+
+#define DEFAULT_SHELL_WIDTH		634
+#define DEFAULT_SHELL_HEIGHT		816
 
 #define DEFAULT_LCD_SIZE		321
 #define DEFAULT_LCD_OFFSET_X		12
@@ -77,6 +82,7 @@
 
 #define RES_PATH			"./res"
 #define BACKGROUND_PATH			RES_PATH"/background.png"
+#define SHELL_PATH			RES_PATH"/shell.png"
 #define ICONS_PATH			RES_PATH"/icons.png"
 
 #define AUDIO_FREQUENCY			48000
@@ -100,7 +106,9 @@ static SDL_Window *window = NULL;
 static SDL_Renderer* renderer = NULL;
 
 static SDL_Texture *bg;
+static SDL_Texture *shell;
 static SDL_Texture *icons;
+static SDL_Rect shell_rect;
 static SDL_Rect bg_rect;
 
 static SDL_AudioSpec audio_spec;
@@ -119,8 +127,10 @@ static emulation_speed_t speed = SPEED_1X;
 static timestamp_t mem_dump_ts = 0;
 
 static uint16_t pixel_stride = DEFAULT_PIXEL_STRIDE;
-static uint16_t window_size, lcd_offset_x, lcd_offset_y, icon_dest_size, icon_offset_x, icon_offset_y, icon_stride_x, icon_stride_y, pixel_size;
+static uint16_t shell_width, shell_height, bg_offset_x, bg_offset_y; // Offsets are relative to the shell (0, 0)
+static uint16_t bg_size, lcd_offset_x, lcd_offset_y, icon_dest_size, icon_offset_x, icon_offset_y, icon_stride_x, icon_stride_y, pixel_size; // Offsets are relative to the background (bg_offset_x, bg_offset_y)
 static uint16_t pixel_alpha_on, pixel_alpha_off, icon_alpha_on, icon_alpha_off;
+static bool_t shell_enable = 1;
 
 #if defined(__WIN32__)
 static LARGE_INTEGER counter_freq;
@@ -202,8 +212,8 @@ static void hal_update_screen(void)
 		for (i = 0; i < LCD_WIDTH; i++) {
 			r.w = pixel_size;
 			r.h = pixel_size;
-			r.x = i * pixel_stride + lcd_offset_x;
-			r.y = j * pixel_stride + lcd_offset_y;
+			r.x = i * pixel_stride + lcd_offset_x + bg_offset_x;
+			r.y = j * pixel_stride + lcd_offset_y + bg_offset_y;
 
 			if (matrix_buffer[j][i]) {
 				SDL_SetRenderDrawColor(renderer, 0, 0, 128, pixel_alpha_on);
@@ -224,8 +234,8 @@ static void hal_update_screen(void)
 
 		dest_icon_r.w = icon_dest_size;
 		dest_icon_r.h = icon_dest_size;
-		dest_icon_r.x = (i % 4) * icon_stride_x + icon_offset_x;
-		dest_icon_r.y = (i / 4) * icon_stride_y + icon_offset_y;
+		dest_icon_r.x = (i % 4) * icon_stride_x + icon_offset_x + bg_offset_x;
+		dest_icon_r.y = (i / 4) * icon_stride_y + icon_offset_y + bg_offset_y;
 
 
 		SDL_SetTextureColorMod(icons, 0, 0, 128);
@@ -237,6 +247,8 @@ static void hal_update_screen(void)
 
 		SDL_RenderCopy(renderer, icons, &src_icon_r, &dest_icon_r);
 	}
+
+	SDL_RenderCopy(renderer, shell, NULL, &shell_rect);
 
 	SDL_RenderPresent(renderer);
 }
@@ -273,7 +285,22 @@ static void compute_layout(void)
 	pixel_size = pixel_stride - pixel_stride/10;
 	lcd_size = pixel_stride * (LCD_WIDTH + 1) - pixel_size;
 
-	window_size = (lcd_size * DEFAULT_WINDOW_SIZE)/DEFAULT_LCD_SIZE;
+	bg_size = (lcd_size * DEFAULT_BACKGROUND_SIZE)/DEFAULT_LCD_SIZE;
+
+	if (shell_enable) {
+		bg_offset_x = (lcd_size * DEFAULT_BACKGROUND_OFFSET_X)/DEFAULT_LCD_SIZE;
+		bg_offset_y = (lcd_size * DEFAULT_BACKGROUND_OFFSET_Y)/DEFAULT_LCD_SIZE;
+
+		shell_width = (lcd_size * DEFAULT_SHELL_WIDTH)/DEFAULT_LCD_SIZE;
+		shell_height = (lcd_size * DEFAULT_SHELL_HEIGHT)/DEFAULT_LCD_SIZE;
+	} else {
+		bg_offset_x = 0;
+		bg_offset_y = 0;
+
+		shell_width = 0;
+		shell_height = 0;
+	}
+
 	lcd_offset_x = (lcd_size * DEFAULT_LCD_OFFSET_X)/DEFAULT_LCD_SIZE + pixel_stride - pixel_size;
 	lcd_offset_y = (lcd_size * DEFAULT_LCD_OFFSET_Y)/DEFAULT_LCD_SIZE;
 	icon_dest_size = (lcd_size * DEFAULT_ICON_DEST_SIZE)/DEFAULT_LCD_SIZE;
@@ -404,6 +431,13 @@ static int handle_sdl_events(SDL_Event *event)
 					sdl_init();
 					break;
 
+				case SDLK_t:
+					sdl_release();
+					shell_enable = !shell_enable;
+					compute_layout();
+					sdl_init();
+					break;
+
 				case SDLK_LEFT:
 					tamalib_set_button(BTN_LEFT, BTN_STATE_PRESSED);
 					break;
@@ -521,7 +555,7 @@ static bool_t sdl_init(void)
 		return 1;
 	}
 
-	window = SDL_CreateWindow(APP_NAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_size, window_size, SDL_WINDOW_SHOWN);
+	window = SDL_CreateWindow(APP_NAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, (shell_enable ? shell_width : bg_size), (shell_enable ? shell_height : bg_size), SDL_WINDOW_SHOWN);
 
 	renderer =  SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
@@ -534,6 +568,15 @@ static bool_t sdl_init(void)
 		return 1;
 	}
 
+	if (shell_enable) {
+		shell = IMG_LoadTexture(renderer, SHELL_PATH);
+		if(!shell) {
+			hal_log(LOG_ERROR, "Failed to load the shell image: %s\n", SDL_GetError());
+			sdl_release();
+			return 1;
+		}
+	}
+
 	icons = IMG_LoadTexture(renderer, ICONS_PATH);
 	if(!icons) {
 		hal_log(LOG_ERROR, "Failed to load the icons image: %s\n", SDL_GetError());
@@ -541,10 +584,15 @@ static bool_t sdl_init(void)
 		return 1;
 	}
 
-	bg_rect.x = 0;
-	bg_rect.y = 0;
-	bg_rect.w = window_size;
-	bg_rect.h = window_size;
+	bg_rect.x = bg_offset_x;
+	bg_rect.y = bg_offset_y;
+	bg_rect.w = bg_size;
+	bg_rect.h = bg_size;
+
+	shell_rect.x = 0;
+	shell_rect.y = 0;
+	shell_rect.w = shell_width;
+	shell_rect.h = shell_height;
 
 	SDL_memset(&audio_spec, 0, sizeof(audio_spec));
 	audio_spec.freq = AUDIO_FREQUENCY;

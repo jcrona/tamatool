@@ -105,6 +105,7 @@ $ ./tamatool -h
 Once running, the three Tamagotchi buttons are mapped to the left, down and right arrows of the keyboard.  
 Pressing __s__ puts the emulation in step by step mode, while __r__ resumes it.  
 Pressing __f__ toggles between the original speed, x10 speed and unlimited speed.  
+Pressing __t__ shows/hides the Tamagotchi shell.  
 Pressing __i__ increases the size of the GUI, while __d__ decreases it.  
 Pressing __b__ saves the emulation state to a __saveN.bin__ file, while __n__ loads the last saved state.
 
