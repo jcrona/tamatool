@@ -266,11 +266,10 @@ static void hal_play_frequency(bool_t en)
 	}
 }
 
-static void compute_layout(uint8_t stride)
+static void compute_layout(void)
 {
 	uint16_t lcd_size;
 
-	pixel_stride = stride;
 	pixel_size = pixel_stride - pixel_stride/10;
 	lcd_size = pixel_stride * (LCD_WIDTH + 1) - pixel_size;
 
@@ -389,7 +388,8 @@ static int handle_sdl_events(SDL_Event *event)
 					}
 
 					sdl_release();
-					compute_layout(++pixel_stride);
+					pixel_stride++;
+					compute_layout();
 					sdl_init();
 					break;
 
@@ -399,7 +399,8 @@ static int handle_sdl_events(SDL_Event *event)
 					}
 
 					sdl_release();
-					compute_layout(--pixel_stride);
+					pixel_stride--;
+					compute_layout();
 					sdl_init();
 					break;
 
@@ -727,7 +728,7 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-	compute_layout(pixel_stride);
+	compute_layout();
 
 	if (sdl_init()) {
 		hal_log(LOG_ERROR, "FATAL: Error while initializing application !\n");
