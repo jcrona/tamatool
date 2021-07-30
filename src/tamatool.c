@@ -63,7 +63,6 @@
 #define REF_LCD_OFFSET_X		12
 #define REF_LCD_OFFSET_Y		93
 
-#define ICON_NUM			8
 #define ICON_SRC_SIZE			64
 
 #define REF_ICON_DEST_SIZE		64
