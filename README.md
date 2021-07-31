@@ -7,7 +7,7 @@ TamaTool is a cross-platform Tamagotchi P1 explorer relying on the hardware agno
 
 More than a simple emulator, it is an exploration tool featuring a realtime RAM editor, an ASM debugger, an I/Os monitor and a sprite manipulator, allowing to play around with the Tamagotchi P1 ROM. It also allows to save and restore its emulation state, thus allowing you to backup and share your best friend !
 
-![TamaTool](misc/screenshot.png)
+![TamaTool](misc/screenshot.png)![TamaTool-Shell](misc/screenshot2.png)
 
 In order to create the background image used in TamaTool, I scanned the background of my own P1, that I filtered/enhanced using GIMP. The original scan be found in the __misc__ folder.
 
