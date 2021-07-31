@@ -197,14 +197,12 @@ static timestamp_t hal_get_timestamp(void)
 #endif
 }
 
-static void hal_usleep(timestamp_t us)
+static void hal_sleep_until(timestamp_t ts)
 {
-	timestamp_t start = hal_get_timestamp();
-
 	/* Since very high accuracy is required here, nanosleep() is not an option
 	 * TODO: find a way to actually sleep
 	 */
-	while (hal_get_timestamp() - start < us);
+	while ((int32_t) (ts - hal_get_timestamp()) > 0);
 }
 
 static void hal_update_screen(void)
@@ -532,7 +530,7 @@ static hal_t hal = {
 	.halt = &hal_halt,
 	.is_log_enabled = &hal_is_log_enabled,
 	.log = &hal_log,
-	.usleep = &hal_usleep,
+	.sleep_until = &hal_sleep_until,
 	.get_timestamp = &hal_get_timestamp,
 	.update_screen = &hal_update_screen,
 	.set_lcd_matrix = &hal_set_lcd_matrix,
