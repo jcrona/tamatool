@@ -9,9 +9,10 @@ More than a simple emulator, it is an exploration tool featuring a realtime RAM 
 
 ![TamaTool](misc/screenshot.png)![TamaTool-Shell](misc/screenshot2.png)
 
-In order to create the background image used in TamaTool, I scanned the background of my own P1, that I filtered/enhanced using GIMP. The original scan be found in the __misc__ folder.
+In order to create the background image used in TamaTool, I scanned the background of my own P1, that I filtered/enhanced using GIMP. The original scan be found in the __misc__ folder. The shell is also a photo of my P1.
 
 __Notes regarding the supported platforms__
+
 The Windows build does not include the realtime memory editor. The ASM debugger and I/Os monitor do work, but the emulation is very slow when they are enabled because of the poor console performances.
 Android support would be feasible, but a native implementation of TamaLIB without libSDL2 would probably be more efficient.
 
@@ -102,7 +103,7 @@ Getting all the supported options:
 $ ./tamatool -h
 ```
 
-Once running, the three Tamagotchi buttons are mapped to the left, down and right arrows of the keyboard.  
+Once running, you can either click on the shell's buttons to interact with the Tamagotchi, or you can press the __left__, __down__ and __right__ arrow keys of your keyboard.  
 Pressing __s__ puts the emulation in step by step mode, while __r__ resumes it.  
 Pressing __f__ toggles between the original speed, x10 speed and unlimited speed.  
 Pressing __t__ shows/hides the Tamagotchi shell.  
