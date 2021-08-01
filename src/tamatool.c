@@ -95,6 +95,8 @@
 #define AUDIO_SAMPLES			480 // 10 ms @ 48000 Hz
 #define AUDIO_VOLUME			0.2f
 
+#define MEM_FRAMERATE			30 // fps
+
 typedef enum {
 	SPEED_UNLIMITED = 0,
 	SPEED_1X = 1,
@@ -507,9 +509,9 @@ static int hal_handler(void)
 	timestamp_t ts;
 
 	if (memory_editor_enable) {
-		/* Dump memory @ FRAMERATE fps */
+		/* Dump memory @ 30 fps */
 		ts = hal_get_timestamp();
-		if (ts - mem_dump_ts >= 1000000/FRAMERATE) {
+		if (ts - mem_dump_ts >= 1000000/MEM_FRAMERATE) {
 			mem_dump_ts = ts;
 			mem_edit_update();
 		}
@@ -814,7 +816,7 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	if (tamalib_init(g_program, g_breakpoints)) {
+	if (tamalib_init(g_program, g_breakpoints, 1000000)) {
 		hal_log(LOG_ERROR, "FATAL: Error while initializing tamalib !\n");
 		sdl_release();
 		SDL_free(g_program);
