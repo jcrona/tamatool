@@ -25,7 +25,7 @@ $ git clone --recursive https://github.com/jcrona/tamatool.git
 
 Then the instructions depend on the targetted platform.
 
-### Linux (or other Unix environment providing the dependencies as system libraries)
+### Linux (or other Unix environments providing the dependencies as system libraries)
 
 TamaTool depends on libSDL2, libSDL2-image and libpng.
 On Ubuntu, you can install those libraries using the following command:
@@ -103,10 +103,10 @@ Getting all the supported options:
 $ ./tamatool -h
 ```
 
-Once running, you can either click on the shell's buttons to interact with the Tamagotchi, or you can press the __left__, __down__ and __right__ arrow keys of your keyboard.  
+Once running, you can either click on the shell buttons to interact with the Tamagotchi, or you can press the __left__, __down__ and __right__ arrow keys of your keyboard.  
 Pressing __s__ puts the emulation in step by step mode, while __r__ resumes it.  
 Pressing __f__ toggles between the original speed, x10 speed and unlimited speed.  
-Pressing __t__ shows/hides the Tamagotchi shell.  
+Pressing __t__ shows/hides the shell of the Tamagotchi.  
 Pressing __i__ increases the size of the GUI, while __d__ decreases it.  
 Pressing __b__ saves the emulation state to a __saveN.bin__ file, while __n__ loads the last saved state.
 
@@ -119,7 +119,7 @@ TamaTool is distributed under the GPLv2 license. See the LICENSE file for more i
 ## Hardware information
 
 The Tamagotchi P1 is based on an E0C6S46 Epson MCU, and runs at 32,768 kHz. Its LCD is 32x16 B/W pixels, with 8 icons.
-To my knowledge, the ROM available online has been extracted from a high-res picture of a die. The ROM mask was clear enough to be optically read. The pictures can be seen [there](https://siliconpr0n.org/map/bandai/tamagotchi-v1/)(thx asterick for the link !).  
+To my knowledge, the ROM available online has been extracted from a high-res picture of a die. The ROM mask was clear enough to be optically read. The pictures can be seen [there](https://siliconpr0n.org/map/bandai/tamagotchi-v1/) (thx asterick for the link !).  
 I would love to see the same work done on a P2 and add support for it in TamaLIB/TamaTool !
 
 __  
