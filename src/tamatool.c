@@ -97,6 +97,12 @@
 
 #define MEM_FRAMERATE			30 // fps
 
+/* Uncomment this line to be as close as possible
+ * to a cycle-accurate emulation. The downside is that
+ * the CPU load will be close to 100%.
+ */
+//#define NO_SLEEP
+
 typedef enum {
 	SPEED_UNLIMITED = 0,
 	SPEED_1X = 1,
@@ -201,10 +207,27 @@ static timestamp_t hal_get_timestamp(void)
 
 static void hal_sleep_until(timestamp_t ts)
 {
-	/* Since very high accuracy is required here, nanosleep() is not an option
-	 * TODO: find a way to actually sleep
+#ifndef NO_SLEEP
+#if defined(__WIN32__)
+	/* Sleep for 1 ms from time to time */
+	while ((int32_t) (ts - hal_get_timestamp()) > 0) Sleep(1);
+#else
+	struct timespec t;
+	int32_t remaining = (int32_t) (ts - hal_get_timestamp());
+
+	/* Sleep for a bit more than what is needed */
+	if (remaining > 0) {
+		t.tv_sec = remaining / 1000000;
+		t.tv_nsec = (remaining % 1000000) * 1000;
+		nanosleep(&t, NULL);
+	}
+#endif
+#else
+	/* Wait instead of sleeping to get the highest possible accuracy
+	 * NOTE: the accuracy still depends on the timestamp_t resolution.
 	 */
 	while ((int32_t) (ts - hal_get_timestamp()) > 0);
+#endif
 }
 
 static void hal_update_screen(void)
