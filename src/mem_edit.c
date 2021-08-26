@@ -79,7 +79,7 @@ static int getch()
 	}
 }
 
-static void print_editor_field(char *name, u4_t val, uint8_t depth, u12_t position)
+static void print_editor_field(char *name, u32_t val, uint8_t depth, u12_t position)
 {
 	u12_t i;
 
