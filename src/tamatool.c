@@ -424,13 +424,23 @@ static int handle_sdl_events(SDL_Event *event)
 					return 1;
 
 				case SDLK_r:
-					tamalib_enable_step_by_step(0);
-					tamalib_pause(0);
+					tamalib_set_exec_mode(EXEC_MODE_RUN);
 					break;
 
 				case SDLK_s:
-					tamalib_enable_step_by_step(1);
-					tamalib_pause(0);
+					tamalib_set_exec_mode(EXEC_MODE_STEP);
+					break;
+
+				case SDLK_w:
+					tamalib_set_exec_mode(EXEC_MODE_NEXT);
+					break;
+
+				case SDLK_x:
+					tamalib_set_exec_mode(EXEC_MODE_TO_CALL);
+					break;
+
+				case SDLK_c:
+					tamalib_set_exec_mode(EXEC_MODE_TO_RET);
 					break;
 
 				case SDLK_f:
@@ -770,8 +780,7 @@ int main(int argc, char **argv)
 				break;
 
 			case 's':
-				tamalib_enable_step_by_step(1);
-				tamalib_pause(1);
+				tamalib_set_exec_mode(EXEC_MODE_STEP);
 				break;
 
 			case 'b':
