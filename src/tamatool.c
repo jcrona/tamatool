@@ -702,7 +702,7 @@ static void usage(FILE * fp, int argc, char **argv)
 		"\t-s | --step                   Enable step by step debugging from the start\n"
 		"\t-b | --break <0xXXX>          Add a breakpoint\n"
 		"\t-m | --memory                 Show memory access\n"
-#if defined(__WIN32__)
+#if !defined(__WIN32__)
 		"\t-e | --editor                 Realtime memory editor\n"
 #endif
 		"\t-c | --cpu                    Show CPU related information\n"
@@ -791,7 +791,7 @@ int main(int argc, char **argv)
 				log_levels |= LOG_MEMORY;
 				break;
 
-#if defined(__WIN32__)
+#if !defined(__WIN32__)
 			case 'e':
 				memory_editor_enable = 1;
 				break;
