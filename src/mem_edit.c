@@ -115,6 +115,19 @@ void mem_edit_update(void)
 
 		if (i == editor_cursor) {
 			printf("\e[0;30;42m");
+		} else if (i < 0x280) {
+			/* RAM */
+		} else if (i >= 0xE00 && i < 0xE50) {
+			/* Display Memory 1 */
+			printf("\e[0;35m");
+		} else if (i >= 0xE80 && i < 0xED0) {
+			/* Display Memory 2 */
+			printf("\e[0;36m");
+		} else if (i >= 0xF00 && i < 0xF80) {
+			/* I/O Memory */
+			printf("\e[0;33m");
+		} else {
+			printf("\e[0;90m");
 		}
 
 		printf("%X", state->memory[i]);
@@ -144,6 +157,17 @@ void mem_edit_update(void)
 	printf("    ");
 	print_editor_field("F", *(state->flags), 1, 16);
 	printf("\r\n");
+
+	printf("\r\n");
+
+	/* Cursor position */
+	if (editor_cursor < MEMORY_SIZE) {
+		printf("\e[1;32mCursor:\e[0m 0x%04X", editor_cursor);
+	} else {
+		printf("\e[1;32mCursor:\e[0m Variable");
+	}
+
+	printf("    [ \e[1;37mRAM\e[0m    \e[1;35mDisplay 1\e[0m    \e[1;36mDisplay 2\e[0m    \e[1;33mI/O\e[0m    \e[1;90mInvalid\e[0m ]\r\n");
 
 	while (kbhit()) {
 		key = getch();
@@ -231,6 +255,7 @@ void mem_edit_update(void)
 				}
 			}
 
+			editor_cursor++;
 			hbyte = -1;
 		}
 	}
