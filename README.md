@@ -104,7 +104,10 @@ $ ./tamatool -h
 ```
 
 Once running, you can either click on the shell buttons to interact with the Tamagotchi, or you can press the __left__, __down__ and __right__ arrow keys of your keyboard.  
-Pressing __s__ puts the emulation in step by step mode, while __r__ resumes it.  
+Pressing __s__ puts the emulation in step by step mode and executes the next instruction, while __r__ resumes it.  
+Pressing __w__ fully executes the next instruction or call (no step by step inside a call).__
+Pressing __x__ stops the execution right after the next call.  
+Pressing __c__ stops the execution right after the next return.  
 Pressing __f__ toggles between the original speed, x10 speed and unlimited speed.  
 Pressing __t__ shows/hides the shell of the Tamagotchi.  
 Pressing __i__ increases the size of the GUI, while __d__ decreases it.  
