@@ -28,7 +28,7 @@
 #include "state.h"
 
 #define STATE_FILE_MAGIC				"TLST"
-#define STATE_FILE_VERSION				0
+#define STATE_FILE_VERSION				1
 
 
 static uint32_t find_next_slot(void)
@@ -118,6 +118,12 @@ void state_save(char *path)
 	buf[0] = *(state->flags) & 0xF;
 	num += SDL_RWwrite(f, buf, 1, 1);
 
+	buf[0] = *(state->tick_counter) & 0xFF;
+	buf[1] = (*(state->tick_counter) >> 8) & 0xFF;
+	buf[2] = (*(state->tick_counter) >> 16) & 0xFF;
+	buf[3] = (*(state->tick_counter) >> 24) & 0xFF;
+	num += SDL_RWwrite(f, buf, 4, 1);
+
 	buf[0] = *(state->clk_timer_timestamp) & 0xFF;
 	buf[1] = (*(state->clk_timer_timestamp) >> 8) & 0xFF;
 	buf[2] = (*(state->clk_timer_timestamp) >> 16) & 0xFF;
@@ -161,7 +167,7 @@ void state_save(char *path)
 		num += SDL_RWwrite(f, buf, 1, 1);
 	}
 
-	if (num != (16 + INT_SLOT_NUM * 3 + MEMORY_SIZE)) {
+	if (num != (17 + INT_SLOT_NUM * 3 + MEMORY_SIZE)) {
 		fprintf(stderr, "FATAL: Failed to write to state file \"%s\" %u %u !\n", path, num, (23 + INT_SLOT_NUM * 3 + MEMORY_SIZE));
 	}
 
@@ -227,6 +233,9 @@ void state_load(char *path)
 	*(state->flags) = buf[0] & 0xF;
 
 	num += SDL_RWread(f, buf, 4, 1);
+	*(state->tick_counter) = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
+
+	num += SDL_RWread(f, buf, 4, 1);
 	*(state->clk_timer_timestamp) = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
 
 	num += SDL_RWread(f, buf, 4, 1);
@@ -260,7 +269,7 @@ void state_load(char *path)
 		state->memory[i] = buf[0] & 0xF;
 	}
 
-	if (num != (16 + INT_SLOT_NUM * 3 + MEMORY_SIZE)) {
+	if (num != (17 + INT_SLOT_NUM * 3 + MEMORY_SIZE)) {
 		fprintf(stderr, "FATAL: Failed to read from state file \"%s\" !\n", path);
 	}
 
