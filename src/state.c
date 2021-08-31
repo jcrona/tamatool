@@ -103,16 +103,21 @@ void state_save(char *path)
 	buf[0] = *(state->flags) & 0xF;
 	num += SDL_RWwrite(f, buf, 1, 1);
 
-	buf[0] = *(state->clk_timer_timestamp) & 0xFF;
-	buf[1] = (*(state->clk_timer_timestamp) >> 8) & 0xFF;
-	buf[2] = (*(state->clk_timer_timestamp) >> 16) & 0xFF;
-	buf[3] = (*(state->clk_timer_timestamp) >> 24) & 0xFF;
+	uint32_t tick_base = *(state->tick_counter);
+	uint32_t relative_clk_timer =
+		tick_base - *(state->clk_timer_timestamp);
+	buf[0] = relative_clk_timer & 0xFF;
+	buf[1] = (relative_clk_timer >> 8) & 0xFF;
+	buf[2] = (relative_clk_timer >> 16) & 0xFF;
+	buf[3] = (relative_clk_timer >> 24) & 0xFF;
 	num += SDL_RWwrite(f, buf, 4, 1);
 
-	buf[0] = *(state->prog_timer_timestamp) & 0xFF;
-	buf[1] = (*(state->prog_timer_timestamp) >> 8) & 0xFF;
-	buf[2] = (*(state->prog_timer_timestamp) >> 16) & 0xFF;
-	buf[3] = (*(state->prog_timer_timestamp) >> 24) & 0xFF;
+	uint32_t relative_prog_timer =
+		tick_base - *(state->prog_timer_timestamp);
+	buf[0] = relative_prog_timer & 0xFF;
+	buf[1] = (relative_prog_timer >> 8) & 0xFF;
+	buf[2] = (relative_prog_timer >> 16) & 0xFF;
+	buf[3] = (relative_prog_timer >> 24) & 0xFF;
 	num += SDL_RWwrite(f, buf, 4, 1);
 
 	buf[0] = *(state->prog_timer_enabled) & 0x1;
@@ -194,11 +199,15 @@ void state_load(char *path)
 	num += SDL_RWread(f, buf, 1, 1);
 	*(state->flags) = buf[0] & 0xF;
 
-	num += SDL_RWread(f, buf, 4, 1);
-	*(state->clk_timer_timestamp) = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
+	uint32_t tick_base = *(state->tick_counter);
 
 	num += SDL_RWread(f, buf, 4, 1);
-	*(state->prog_timer_timestamp) = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
+	*(state->clk_timer_timestamp) = tick_base -
+		(buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24));
+
+	num += SDL_RWread(f, buf, 4, 1);
+	*(state->prog_timer_timestamp) = tick_base -
+		(buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24));
 
 	num += SDL_RWread(f, buf, 1, 1);
 	*(state->prog_timer_enabled) = buf[0] & 0x1;
