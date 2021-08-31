@@ -27,6 +27,9 @@
 
 #include "state.h"
 
+#define STATE_FILE_MAGIC				"TLST"
+#define STATE_FILE_VERSION				0
+
 
 static uint32_t find_next_slot(void)
 {
@@ -75,7 +78,19 @@ void state_save(char *path)
 		return;
 	}
 
-	/* All fields are written as u8, u16 little-endian or u32 little-endian following the struct order */
+	/* First the magic, then the version, and finally the fields of
+	 * the state_t struct written as u8, u16 little-endian or u32
+	 * little-endian following the struct order
+	 */
+	buf[0] = (uint8_t) STATE_FILE_MAGIC[0];
+	buf[1] = (uint8_t) STATE_FILE_MAGIC[1];
+	buf[2] = (uint8_t) STATE_FILE_MAGIC[2];
+	buf[3] = (uint8_t) STATE_FILE_MAGIC[3];
+	num += SDL_RWwrite(f, buf, 4, 1);
+
+	buf[0] = STATE_FILE_VERSION & 0xFF;
+	num += SDL_RWwrite(f, buf, 1, 1);
+
 	buf[0] = *(state->pc) & 0xFF;
 	buf[1] = (*(state->pc) >> 8) & 0x1F;
 	num += SDL_RWwrite(f, buf, 2, 1);
@@ -146,8 +161,8 @@ void state_save(char *path)
 		num += SDL_RWwrite(f, buf, 1, 1);
 	}
 
-	if (num != (14 + INT_SLOT_NUM * 3 + MEMORY_SIZE)) {
-		fprintf(stderr, "FATAL: Failed to write to state file \"%s\" !\n", path);
+	if (num != (16 + INT_SLOT_NUM * 3 + MEMORY_SIZE)) {
+		fprintf(stderr, "FATAL: Failed to write to state file \"%s\" %u %u !\n", path, num, (23 + INT_SLOT_NUM * 3 + MEMORY_SIZE));
 	}
 
 	SDL_RWclose(f);
@@ -169,7 +184,24 @@ void state_load(char *path)
 		return;
 	}
 
-	/* All fields are read as u8, u16 little-endian or u32 little-endian following the struct order */
+	/* First the magic, then the version, and finally the fields of
+	 * the state_t struct written as u8, u16 little-endian or u32
+	 * little-endian following the struct order
+	 */
+	num += SDL_RWread(f, buf, 4, 1);
+	if (buf[0] != (uint8_t) STATE_FILE_MAGIC[0] || buf[1] != (uint8_t) STATE_FILE_MAGIC[1] ||
+		buf[2] != (uint8_t) STATE_FILE_MAGIC[2] || buf[3] != (uint8_t) STATE_FILE_MAGIC[3]) {
+		fprintf(stderr, "FATAL: Wrong state file magic in \"%s\" !\n", path);
+		return;
+	}
+
+	num += SDL_RWread(f, buf, 1, 1);
+	if (buf[0] != STATE_FILE_VERSION) {
+		fprintf(stderr, "FATAL: Unsupported version %u (expected %u) in state file \"%s\" !\n", buf[0], STATE_FILE_VERSION, path);
+		/* TODO: Handle migration at a point */
+		return;
+	}
+
 	num += SDL_RWread(f, buf, 2, 1);
 	*(state->pc) = buf[0] | ((buf[1] & 0x1F) << 8);
 
@@ -228,7 +260,7 @@ void state_load(char *path)
 		state->memory[i] = buf[0] & 0xF;
 	}
 
-	if (num != (14 + INT_SLOT_NUM * 3 + MEMORY_SIZE)) {
+	if (num != (16 + INT_SLOT_NUM * 3 + MEMORY_SIZE)) {
 		fprintf(stderr, "FATAL: Failed to read from state file \"%s\" !\n", path);
 	}
 
