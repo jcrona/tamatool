@@ -131,7 +131,7 @@ static u32_t current_freq = 0; // in dHz
 static unsigned int sin_pos = 0;
 static bool_t is_audio_playing = 0;
 
-static bool_t matrix_buffer[LCD_HEIGTH][LCD_WIDTH] = {{0}};
+static bool_t matrix_buffer[LCD_HEIGHT][LCD_WIDTH] = {{0}};
 static bool_t icon_buffer[ICON_NUM] = {0};
 
 static u8_t log_levels = LOG_ERROR | LOG_INFO;
@@ -238,7 +238,7 @@ static void hal_update_screen(void)
 	SDL_RenderCopy(renderer, bg, NULL, &bg_rect);
 
 	/* Dot matrix */
-	for (j = 0; j < LCD_HEIGTH; j++) {
+	for (j = 0; j < LCD_HEIGHT; j++) {
 		for (i = 0; i < LCD_WIDTH; i++) {
 			r.w = pixel_size;
 			r.h = pixel_size;
