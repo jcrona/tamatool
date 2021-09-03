@@ -274,4 +274,6 @@ void state_load(char *path)
 	}
 
 	SDL_RWclose(f);
+
+	tamalib_refresh_hw();
 }
