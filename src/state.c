@@ -28,7 +28,7 @@
 #include "state.h"
 
 #define STATE_FILE_MAGIC				"TLST"
-#define STATE_FILE_VERSION				1
+#define STATE_FILE_VERSION				2
 
 
 static uint32_t find_next_slot(void)
@@ -162,12 +162,19 @@ void state_save(char *path)
 		num += SDL_RWwrite(f, buf, 1, 1);
 	}
 
-	for (i = 0; i < MEMORY_SIZE; i++) {
-		buf[0] = state->memory[i] & 0xF;
+	/* First 640 half bytes correspond to the RAM */
+	for (i = 0; i < MEM_RAM_SIZE; i++) {
+		buf[0] = state->memory[i + MEM_RAM_ADDR] & 0xF;
 		num += SDL_RWwrite(f, buf, 1, 1);
 	}
 
-	if (num != (17 + INT_SLOT_NUM * 3 + MEMORY_SIZE)) {
+	/* I/Os are from 0xF00 to 0xF7F */
+	for (i = 0; i < MEM_IO_SIZE; i++) {
+		buf[0] = state->memory[i + MEM_IO_ADDR] & 0xF;
+		num += SDL_RWwrite(f, buf, 1, 1);
+	}
+
+	if (num != (17 + INT_SLOT_NUM * 3 + MEM_RAM_SIZE + MEM_IO_SIZE)) {
 		fprintf(stderr, "FATAL: Failed to write to state file \"%s\" %u %u !\n", path, num, (23 + INT_SLOT_NUM * 3 + MEMORY_SIZE));
 	}
 
@@ -264,12 +271,19 @@ void state_load(char *path)
 		state->interrupts[i].triggered = buf[0] & 0x1;
 	}
 
-	for (i = 0; i < MEMORY_SIZE; i++) {
+	/* First 640 half bytes correspond to the RAM */
+	for (i = 0; i < MEM_RAM_SIZE; i++) {
 		num += SDL_RWread(f, buf, 1, 1);
-		state->memory[i] = buf[0] & 0xF;
+		state->memory[i + MEM_RAM_ADDR] = buf[0] & 0xF;
 	}
 
-	if (num != (17 + INT_SLOT_NUM * 3 + MEMORY_SIZE)) {
+	/* I/Os are from 0xF00 to 0xF7F */
+	for (i = 0; i < MEM_IO_SIZE; i++) {
+		num += SDL_RWread(f, buf, 1, 1);
+		state->memory[i + MEM_IO_ADDR] = buf[0] & 0xF;
+	}
+
+	if (num != (17 + INT_SLOT_NUM * 3 + MEM_RAM_SIZE + MEM_IO_SIZE)) {
 		fprintf(stderr, "FATAL: Failed to read from state file \"%s\" !\n", path);
 	}
 
