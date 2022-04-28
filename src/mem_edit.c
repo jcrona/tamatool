@@ -130,7 +130,7 @@ void mem_edit_update(void)
 			printf("\e[0;90m");
 		}
 
-		printf("%X", state->memory[i]);
+		printf("%X", GET_MEMORY(state->memory, i));
 
 		if (i == editor_cursor) {
 			printf("\e[0m");
@@ -233,7 +233,7 @@ void mem_edit_update(void)
 		if (hbyte >= 0) {
 			if (editor_cursor < MEMORY_SIZE) {
 				/* Memory */
-				state->memory[editor_cursor] = hbyte;
+				SET_MEMORY(state->memory, editor_cursor, hbyte);
 			} else {
 				/* Variables */
 				if ((editor_cursor & 0xFFF) < 4) {

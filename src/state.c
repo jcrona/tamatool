@@ -164,13 +164,13 @@ void state_save(char *path)
 
 	/* First 640 half bytes correspond to the RAM */
 	for (i = 0; i < MEM_RAM_SIZE; i++) {
-		buf[0] = state->memory[i + MEM_RAM_ADDR] & 0xF;
+		buf[0] = GET_RAM_MEMORY(state->memory, i + MEM_RAM_ADDR) & 0xF;
 		num += SDL_RWwrite(f, buf, 1, 1);
 	}
 
 	/* I/Os are from 0xF00 to 0xF7F */
 	for (i = 0; i < MEM_IO_SIZE; i++) {
-		buf[0] = state->memory[i + MEM_IO_ADDR] & 0xF;
+		buf[0] = GET_IO_MEMORY(state->memory, i + MEM_IO_ADDR) & 0xF;
 		num += SDL_RWwrite(f, buf, 1, 1);
 	}
 
@@ -274,13 +274,13 @@ void state_load(char *path)
 	/* First 640 half bytes correspond to the RAM */
 	for (i = 0; i < MEM_RAM_SIZE; i++) {
 		num += SDL_RWread(f, buf, 1, 1);
-		state->memory[i + MEM_RAM_ADDR] = buf[0] & 0xF;
+		SET_RAM_MEMORY(state->memory, i + MEM_RAM_ADDR, buf[0] & 0xF);
 	}
 
 	/* I/Os are from 0xF00 to 0xF7F */
 	for (i = 0; i < MEM_IO_SIZE; i++) {
 		num += SDL_RWread(f, buf, 1, 1);
-		state->memory[i + MEM_IO_ADDR] = buf[0] & 0xF;
+		SET_IO_MEMORY(state->memory, i + MEM_IO_ADDR, buf[0] & 0xF);
 	}
 
 	if (num != (17 + INT_SLOT_NUM * 3 + MEM_RAM_SIZE + MEM_IO_SIZE)) {
