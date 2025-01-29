@@ -121,7 +121,7 @@ void program_to_header(u12_t *program, uint32_t size)
 
 static uint32_t generate_data_map(map_t *map, u12_t *program, uint32_t size, uint32_t *max_width)
 {
-	uint32_t i, j, k;
+	uint32_t i;
 	uint32_t count = 0;
 	uint32_t width = 0;
 
@@ -144,11 +144,6 @@ static uint32_t generate_data_map(map_t *map, u12_t *program, uint32_t size, uin
 
 				if (map[count].width > *max_width) {
 					*max_width = map[count].width;
-				}
-
-				for (k = 0; k < map[count].height; k++) {
-					for (j = 0; j < map[count].width; j++) {
-					}
 				}
 
 				count++;
