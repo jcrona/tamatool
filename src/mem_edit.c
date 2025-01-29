@@ -115,15 +115,15 @@ void mem_edit_update(void)
 
 		if (i == editor_cursor) {
 			printf("\e[0;30;42m");
-		} else if (i < 0x280) {
+		} else if (i >= MEM_RAM_ADDR && i < (MEM_RAM_ADDR + MEM_RAM_SIZE)) {
 			/* RAM */
-		} else if (i >= 0xE00 && i < 0xE50) {
+		} else if (i >= MEM_DISPLAY1_ADDR && i < (MEM_DISPLAY1_ADDR + MEM_DISPLAY1_SIZE)) {
 			/* Display Memory 1 */
 			printf("\e[0;35m");
-		} else if (i >= 0xE80 && i < 0xED0) {
+		} else if (i >= MEM_DISPLAY2_ADDR && i < (MEM_DISPLAY2_ADDR + MEM_DISPLAY2_SIZE)) {
 			/* Display Memory 2 */
 			printf("\e[0;36m");
-		} else if (i >= 0xF00 && i < 0xF80) {
+		} else if (i >= MEM_IO_ADDR && i < (MEM_IO_ADDR + MEM_IO_SIZE)) {
 			/* I/O Memory */
 			printf("\e[0;33m");
 		} else {
