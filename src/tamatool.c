@@ -513,6 +513,10 @@ static int handle_sdl_events(SDL_Event *event)
 				case SDLK_RIGHT:
 					tamalib_set_button(BTN_RIGHT, BTN_STATE_PRESSED);
 					break;
+
+				case SDLK_SPACE:
+					tamalib_set_button(BTN_TAP, BTN_STATE_PRESSED);
+					break;
 			}
 			break;
 
@@ -528,6 +532,10 @@ static int handle_sdl_events(SDL_Event *event)
 
 				case SDLK_RIGHT:
 					tamalib_set_button(BTN_RIGHT, BTN_STATE_RELEASED);
+					break;
+
+				case SDLK_SPACE:
+					tamalib_set_button(BTN_TAP, BTN_STATE_RELEASED);
 					break;
 			}
 			break;
