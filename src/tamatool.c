@@ -706,12 +706,13 @@ static void usage(FILE * fp, int argc, char **argv)
 		"\t-e | --editor                 Realtime memory editor\n"
 #endif
 		"\t-c | --cpu                    Show CPU related information\n"
+		"\t-i | --int                    Show interrupt related information\n"
 		"\t-v | --verbose                Show all information\n"
 		"\t-h | --help                   Print this message\n",
 		argv[0], ROM_PATH);
 }
 
-static const char short_options[] = "r:E:M:Hl:sb:mecvh";
+static const char short_options[] = "r:E:M:Hl:sb:mecivh";
 
 static const struct option long_options[] = {
 	{"rom", required_argument, NULL, 'r'},
@@ -724,6 +725,7 @@ static const struct option long_options[] = {
 	{"memory", no_argument, NULL, 'm'},
 	{"editor", no_argument, NULL, 'e'},
 	{"cpu", no_argument, NULL, 'c'},
+	{"int", no_argument, NULL, 'i'},
 	{"verbose", no_argument, NULL, 'v'},
 	{"help", no_argument, NULL, 'h'},
 	{0, 0, 0, 0}
@@ -799,6 +801,10 @@ int main(int argc, char **argv)
 
 			case 'c':
 				log_levels |= LOG_CPU;
+				break;
+
+			case 'i':
+				log_levels |= LOG_INT;
 				break;
 
 			case 'v':
