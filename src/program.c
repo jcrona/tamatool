@@ -119,11 +119,13 @@ void program_to_header(u12_t *program, uint32_t size)
 	fprintf(stdout, "\n};\n");
 }
 
-static uint32_t generate_data_map(map_t *map, u12_t *program, uint32_t size)
+static uint32_t generate_data_map(map_t *map, u12_t *program, uint32_t size, uint32_t *max_width)
 {
 	uint32_t i, j, k;
 	uint32_t count = 0;
 	uint32_t width = 0;
+
+	*max_width = 0;
 
 	/* Parse the program to get a map */
 	for (i = 0; i < size; i++) {
@@ -139,6 +141,10 @@ static uint32_t generate_data_map(map_t *map, u12_t *program, uint32_t size)
 				map[count].ref = i - width;
 				map[count].width = width + 1;
 				map[count].height = 8;
+
+				if (map[count].width > *max_width) {
+					*max_width = map[count].width;
+				}
 
 				for (k = 0; k < map[count].height; k++) {
 					for (j = 0; j < map[count].width; j++) {
@@ -160,17 +166,18 @@ void program_get_data(u12_t *program, uint32_t size, char *path)
 	uint32_t i, j, k;
 	uint8_t depth;
 	uint32_t sprite_num = 0;
+	uint32_t img_width;
 	image_t img;
 
-	sprite_num = generate_data_map(g_map, program, size);
+	sprite_num = generate_data_map(g_map, program, size, &img_width);
 
 	/* Create an image file from the map */
-	img.width = 18;
+	img.width = img_width + 2;
 	img.height = sprite_num * 10;
 	img.color_type = PNG_COLOR_TYPE_RGBA;
 	img.bit_depth = 8;
 	depth = img.bit_depth/8 * 4;
-	img.stride = 18 * depth;
+	img.stride = img.width * depth;
 
 	image_alloc(&img);
 
@@ -217,7 +224,7 @@ void program_get_data(u12_t *program, uint32_t size, char *path)
 		}
 	}
 
-	printf("Writing %u sprites to file %s ...\n", sprite_num, path);
+	printf("Writing %u sprites to file %s (%ux%u px)...\n", sprite_num, path, img.width, img.height);
 	image_write_file(path, &img);
 
 	image_free(&img);
@@ -228,12 +235,18 @@ void program_set_data(u12_t *program, uint32_t size, char *path)
 	uint32_t i, j, k;
 	uint8_t depth;
 	uint32_t sprite_num = 0;
+	uint32_t img_width;
 	image_t img;
 
 	image_read_file(path, &img);
-	printf("Reading %u sprites from file %s ...\n", img.height/10, path);
+	printf("Reading %u sprites from file %s (%ux%u px)...\n", img.height/10, path, img.width, img.height);
 
-	sprite_num = generate_data_map(g_map, program, size);
+	sprite_num = generate_data_map(g_map, program, size, &img_width);
+
+	if (img_width + 2 != img.width)  {
+		fprintf(stderr, "FATAL: Invalid image width (%u != %u) !\n", img.width, img_width + 2);
+		return;
+	}
 
 	if (sprite_num != img.height/10)  {
 		fprintf(stderr, "FATAL: Invalid number of sprites (%u != %u) !\n", img.height/10, sprite_num);
