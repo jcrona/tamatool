@@ -28,7 +28,7 @@
 #include "state.h"
 
 #define STATE_FILE_MAGIC				"TLST"
-#define STATE_FILE_VERSION				2
+#define STATE_FILE_VERSION				3
 
 
 static uint32_t find_next_slot(void)
@@ -124,10 +124,52 @@ void state_save(char *path)
 	buf[3] = (*(state->tick_counter) >> 24) & 0xFF;
 	num += SDL_RWwrite(f, buf, 4, 1);
 
-	buf[0] = *(state->clk_timer_timestamp) & 0xFF;
-	buf[1] = (*(state->clk_timer_timestamp) >> 8) & 0xFF;
-	buf[2] = (*(state->clk_timer_timestamp) >> 16) & 0xFF;
-	buf[3] = (*(state->clk_timer_timestamp) >> 24) & 0xFF;
+	buf[0] = *(state->clk_timer_2hz_timestamp) & 0xFF;
+	buf[1] = (*(state->clk_timer_2hz_timestamp) >> 8) & 0xFF;
+	buf[2] = (*(state->clk_timer_2hz_timestamp) >> 16) & 0xFF;
+	buf[3] = (*(state->clk_timer_2hz_timestamp) >> 24) & 0xFF;
+	num += SDL_RWwrite(f, buf, 4, 1);
+
+	buf[0] = *(state->clk_timer_4hz_timestamp) & 0xFF;
+	buf[1] = (*(state->clk_timer_4hz_timestamp) >> 8) & 0xFF;
+	buf[2] = (*(state->clk_timer_4hz_timestamp) >> 16) & 0xFF;
+	buf[3] = (*(state->clk_timer_4hz_timestamp) >> 24) & 0xFF;
+	num += SDL_RWwrite(f, buf, 4, 1);
+
+	buf[0] = *(state->clk_timer_8hz_timestamp) & 0xFF;
+	buf[1] = (*(state->clk_timer_8hz_timestamp) >> 8) & 0xFF;
+	buf[2] = (*(state->clk_timer_8hz_timestamp) >> 16) & 0xFF;
+	buf[3] = (*(state->clk_timer_8hz_timestamp) >> 24) & 0xFF;
+	num += SDL_RWwrite(f, buf, 4, 1);
+
+	buf[0] = *(state->clk_timer_16hz_timestamp) & 0xFF;
+	buf[1] = (*(state->clk_timer_16hz_timestamp) >> 8) & 0xFF;
+	buf[2] = (*(state->clk_timer_16hz_timestamp) >> 16) & 0xFF;
+	buf[3] = (*(state->clk_timer_16hz_timestamp) >> 24) & 0xFF;
+	num += SDL_RWwrite(f, buf, 4, 1);
+
+	buf[0] = *(state->clk_timer_32hz_timestamp) & 0xFF;
+	buf[1] = (*(state->clk_timer_32hz_timestamp) >> 8) & 0xFF;
+	buf[2] = (*(state->clk_timer_32hz_timestamp) >> 16) & 0xFF;
+	buf[3] = (*(state->clk_timer_32hz_timestamp) >> 24) & 0xFF;
+	num += SDL_RWwrite(f, buf, 4, 1);
+
+	buf[0] = *(state->clk_timer_64hz_timestamp) & 0xFF;
+	buf[1] = (*(state->clk_timer_64hz_timestamp) >> 8) & 0xFF;
+	buf[2] = (*(state->clk_timer_64hz_timestamp) >> 16) & 0xFF;
+	buf[3] = (*(state->clk_timer_64hz_timestamp) >> 24) & 0xFF;
+	num += SDL_RWwrite(f, buf, 4, 1);
+
+	buf[0] = *(state->clk_timer_128hz_timestamp) & 0xFF;
+	buf[1] = (*(state->clk_timer_128hz_timestamp) >> 8) & 0xFF;
+	buf[2] = (*(state->clk_timer_128hz_timestamp) >> 16) & 0xFF;
+	buf[3] = (*(state->clk_timer_128hz_timestamp) >> 24) & 0xFF;
+	num += SDL_RWwrite(f, buf, 4, 1);
+
+	buf[0] = *(state->clk_timer_256hz_timestamp) & 0xFF;
+	buf[1] = (*(state->clk_timer_256hz_timestamp) >> 8) & 0xFF;
+	buf[2] = (*(state->clk_timer_256hz_timestamp) >> 16) & 0xFF;
+	buf[3] = (*(state->clk_timer_256hz_timestamp) >> 24) & 0xFF;
 	num += SDL_RWwrite(f, buf, 4, 1);
 
 	buf[0] = *(state->prog_timer_timestamp) & 0xFF;
@@ -174,7 +216,7 @@ void state_save(char *path)
 		num += SDL_RWwrite(f, buf, 1, 1);
 	}
 
-	if (num != (17 + INT_SLOT_NUM * 3 + MEM_RAM_SIZE + MEM_IO_SIZE)) {
+	if (num != (24 + INT_SLOT_NUM * 3 + MEM_RAM_SIZE + MEM_IO_SIZE)) {
 		fprintf(stderr, "FATAL: Failed to write to state file \"%s\" %u %u !\n", path, num, (23 + INT_SLOT_NUM * 3 + MEMORY_SIZE));
 	}
 
@@ -243,7 +285,28 @@ void state_load(char *path)
 	*(state->tick_counter) = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
 
 	num += SDL_RWread(f, buf, 4, 1);
-	*(state->clk_timer_timestamp) = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
+	*(state->clk_timer_2hz_timestamp) = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
+
+	num += SDL_RWread(f, buf, 4, 1);
+	*(state->clk_timer_4hz_timestamp) = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
+
+	num += SDL_RWread(f, buf, 4, 1);
+	*(state->clk_timer_8hz_timestamp) = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
+
+	num += SDL_RWread(f, buf, 4, 1);
+	*(state->clk_timer_16hz_timestamp) = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
+
+	num += SDL_RWread(f, buf, 4, 1);
+	*(state->clk_timer_32hz_timestamp) = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
+
+	num += SDL_RWread(f, buf, 4, 1);
+	*(state->clk_timer_64hz_timestamp) = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
+
+	num += SDL_RWread(f, buf, 4, 1);
+	*(state->clk_timer_128hz_timestamp) = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
+
+	num += SDL_RWread(f, buf, 4, 1);
+	*(state->clk_timer_256hz_timestamp) = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
 
 	num += SDL_RWread(f, buf, 4, 1);
 	*(state->prog_timer_timestamp) = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
@@ -283,7 +346,7 @@ void state_load(char *path)
 		SET_IO_MEMORY(state->memory, i + MEM_IO_ADDR, buf[0] & 0xF);
 	}
 
-	if (num != (17 + INT_SLOT_NUM * 3 + MEM_RAM_SIZE + MEM_IO_SIZE)) {
+	if (num != (24 + INT_SLOT_NUM * 3 + MEM_RAM_SIZE + MEM_IO_SIZE)) {
 		fprintf(stderr, "FATAL: Failed to read from state file \"%s\" !\n", path);
 	}
 
