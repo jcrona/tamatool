@@ -43,8 +43,8 @@
 #include "mem_edit.h"
 
 #define APP_NAME			"TamaTool"
-#define APP_VERSION			"0.1" // Major, minor
-#define COPYRIGHT_DATE			"2021"
+#define APP_VERSION			"0.2" // Major, minor
+#define COPYRIGHT_DATE			"2025"
 #define AUTHOR_NAME			"Jean-Christophe Rona"
 
 #define ROM_PATH			"rom.bin"
