@@ -237,7 +237,12 @@ static void hal_update_screen(void)
 	unsigned int i, j;
 	SDL_Rect r, src_icon_r, dest_icon_r;
 
-	SDL_RenderCopy(renderer, bg, NULL, &bg_rect);
+	if (bg != NULL) {
+		SDL_RenderCopy(renderer, bg, NULL, &bg_rect);
+	} else {
+		SDL_SetRenderDrawColor(renderer, 192, 192, 192, 255);
+		SDL_RenderFillRect(renderer, &bg_rect);
+	}
 
 	/* Dot matrix */
 	for (j = 0; j < LCD_HEIGHT; j++) {
@@ -637,9 +642,7 @@ static bool_t sdl_init(void)
 
 	bg = IMG_LoadTexture(renderer, BACKGROUND_PATH);
 	if(!bg) {
-		hal_log(LOG_ERROR, "Failed to load the background image: %s\n", SDL_GetError());
-		sdl_release();
-		return 1;
+		hal_log(LOG_INFO, "Failed to load the background image: %s\n", SDL_GetError());
 	}
 
 	if (shell_enable) {
