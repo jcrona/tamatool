@@ -690,7 +690,7 @@ static bool_t sdl_init(void)
 	return 0;
 }
 
-void rom_not_found_msg(void)
+static void rom_not_found_msg(void)
 {
 #if defined(__WIN32__)
 	MessageBox(NULL, ROM_NOT_FOUND_MSG, ROM_NOT_FOUND_TITLE, MB_OK);
