@@ -30,14 +30,16 @@
 #define STATE_FILE_MAGIC				"TLST"
 #define STATE_FILE_VERSION				3
 
+#define STATE_TEMPLATE					"%s_save%u.bin"
 
-static uint32_t find_next_slot(void)
+
+static uint32_t find_next_slot(char *rom_name)
 {
 	char path[256];
 	uint32_t i = 0;
 
 	for (i = 0;; i++) {
-		sprintf(path, STATE_TEMPLATE, i);
+		sprintf(path, STATE_TEMPLATE, rom_name, i);
 		if (!SDL_RWFromFile(path, "r")) {
 			break;
 		}
@@ -46,17 +48,17 @@ static uint32_t find_next_slot(void)
 	return i;
 }
 
-void state_find_next_name(char *path)
+void state_find_next_name(char *path, char *rom_name)
 {
-	sprintf(path, STATE_TEMPLATE, find_next_slot());
+	sprintf(path, STATE_TEMPLATE, rom_name, find_next_slot(rom_name));
 }
 
-void state_find_last_name(char *path)
+void state_find_last_name(char *path, char *rom_name)
 {
-	uint32_t num = find_next_slot();
+	uint32_t num = find_next_slot(rom_name);
 
 	if (num > 0) {
-		sprintf(path, STATE_TEMPLATE, num - 1);
+		sprintf(path, STATE_TEMPLATE, rom_name, num - 1);
 	} else {
 		path[0] = '\0';
 	}

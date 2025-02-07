@@ -20,11 +20,9 @@
 #ifndef _STATE_H_
 #define _STATE_H_
 
-#define STATE_TEMPLATE			"save%u.bin"
 
-
-void state_find_next_name(char *path);
-void state_find_last_name(char *path);
+void state_find_next_name(char *path, char *rom_name);
+void state_find_last_name(char *path, char *rom_name);
 void state_save(char *path);
 void state_load(char *path);
 

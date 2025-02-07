@@ -114,6 +114,8 @@ static breakpoint_t *g_breakpoints = NULL;
 static u12_t *g_program = NULL;		// The actual program that is executed
 static uint32_t g_program_size = 0;
 
+static char rom_basename[256] = "";
+
 static bool_t memory_editor_enable = 0;
 
 static SDL_Window *window = NULL;
@@ -462,12 +464,12 @@ static int handle_sdl_events(SDL_Event *event)
 					break;
 
 				case SDLK_b:
-					state_find_next_name(save_path);
+					state_find_next_name(save_path, rom_basename);
 					state_save(save_path);
 					break;
 
 				case SDLK_n:
-					state_find_last_name(save_path);
+					state_find_last_name(save_path, rom_basename);
 					if (save_path[0]) {
 						state_load(save_path);
 					}
@@ -696,6 +698,21 @@ void rom_not_found_msg(void)
 #endif
 }
 
+static void set_rom_basename(char *path)
+{
+	char *last_point, *start;
+	char tmp_str[256];;
+
+	strncpy(tmp_str, path, 256);
+	start = basename(tmp_str);
+	strncpy(rom_basename, start, 256);
+
+	last_point = strrchr(rom_basename, '.');
+	if (last_point != NULL) {
+		*last_point = '\0';
+	}
+}
+
 static void usage(FILE * fp, int argc, char **argv)
 {
 	fprintf(fp,
@@ -828,6 +845,8 @@ int main(int argc, char **argv)
 				exit(EXIT_FAILURE);
 		}
 	}
+
+	set_rom_basename(rom_path);
 
 	g_program = program_load(rom_path, &g_program_size);
 	if (g_program == NULL) {
