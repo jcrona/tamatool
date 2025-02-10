@@ -735,6 +735,7 @@ static void usage(FILE * fp, int argc, char **argv)
 		"\t-l | --load <path>            Load the given memory state file (save)\n"
 		"\t-s | --step                   Enable step by step debugging from the start\n"
 		"\t-b | --break <0xXXX>          Add a breakpoint\n"
+		"\t-t | --type <name>            Force type to name (default is auto detect)\n"
 		"\t-m | --memory                 Show memory access\n"
 #if !defined(__WIN32__)
 		"\t-e | --editor                 Realtime memory editor\n"
@@ -746,7 +747,7 @@ static void usage(FILE * fp, int argc, char **argv)
 		argv[0], ROM_PATH);
 }
 
-static const char short_options[] = "r:E:M:Hl:sb:mecivh";
+static const char short_options[] = "r:E:M:Hl:sb:t:mecivh";
 
 static const struct option long_options[] = {
 	{"rom", required_argument, NULL, 'r'},
@@ -756,6 +757,7 @@ static const struct option long_options[] = {
 	{"load", required_argument, NULL, 'l'},
 	{"step", no_argument, NULL, 's'},
 	{"break", required_argument, NULL, 'b'},
+	{"type", required_argument, NULL, 't'},
 	{"memory", no_argument, NULL, 'm'},
 	{"editor", no_argument, NULL, 'e'},
 	{"cpu", no_argument, NULL, 'c'},
@@ -821,6 +823,10 @@ int main(int argc, char **argv)
 
 			case 'b':
 				tamalib_add_bp(&g_breakpoints, strtoul(optarg, NULL, 0));
+				break;
+
+			case 't':
+				rom_type = program_validate_type_str(optarg);
 				break;
 
 			case 'm':
