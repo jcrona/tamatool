@@ -20,11 +20,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "SDL.h"
 
 #include "program.h"
 #include "image.h"
+
+/* This part of the program has been selected because it differs between
+ * P1 and P2 (at least) while not containing customizable data.
+ */
+#define CRC_DETECTION_OFFSET				0x2F0
+#define CRC_DETECTION_LENGTH				0x110
 
 typedef struct map {
 	uint32_t ref;
@@ -33,6 +40,10 @@ typedef struct map {
 } map_t;
 
 static map_t g_map[MAX_SPRITES];
+
+static char *rom_type_str[] = {
+	[ROM_TYPE_P1] = "p1",
+};
 
 
 u12_t * program_load(char *path, uint32_t *size)
@@ -265,4 +276,51 @@ void program_set_data(u12_t *program, uint32_t size, char *path)
 	}
 
 	image_free(&img);
+}
+
+static uint32_t crc32(const char *data, uint32_t length) {
+	uint32_t crc = ~0U;
+	uint8_t i;
+
+	while (length--) {
+		crc ^= (unsigned char) *data++;
+		for (i = 0; i < 8; i++) {
+			crc = crc & 1 ? (crc >> 1) ^ 0xEDB88320 : crc >> 1;
+		}
+	}
+
+	return ~crc;
+}
+
+rom_type_t program_detect_type(u12_t *program)
+{
+	/* This cast assumes that u12_t are actually stored in uint16_t */
+	uint32_t crc = crc32((const char *) &program[CRC_DETECTION_OFFSET/2], CRC_DETECTION_LENGTH);
+
+	switch (crc) {
+		case 0xC7875F27:
+			return ROM_TYPE_P1;
+
+		default:
+			/* Default is Tamagotchi P1 */
+			return ROM_TYPE_P1;
+	}
+}
+
+char * program_detect_type_str(u12_t *program)
+{
+	return rom_type_str[program_detect_type(program)];
+}
+
+char * program_validate_type_str(char *type)
+{
+	uint8_t i;
+
+	for (i = 0; i < ROM_TYPE_MAX; i++) {
+		if (!strcmp(rom_type_str[i], type)) {
+			return rom_type_str[i];
+		}
+	}
+
+	return NULL;
 }

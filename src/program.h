@@ -24,11 +24,19 @@
 
 #define MAX_SPRITES			256
 
+typedef enum {
+	ROM_TYPE_P1 = 0,
+	ROM_TYPE_MAX
+} rom_type_t;
+
 
 u12_t * program_load(char *path, uint32_t *size);
 void program_save(char *path, u12_t *program, uint32_t size);
 void program_to_header(u12_t *program, uint32_t size);
 void program_get_data(u12_t *program, uint32_t size, char *path);
 void program_set_data(u12_t *program, uint32_t size, char *path);
+rom_type_t program_detect_type(u12_t *program);
+char * program_detect_type_str(u12_t *program);
+char * program_validate_type_str(char *type);
 
 #endif /* _PROGRAM_H_ */
