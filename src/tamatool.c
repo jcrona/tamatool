@@ -23,6 +23,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <getopt.h>
+#include <libgen.h>
 #if !defined(__WIN32__)
 #include <time.h>
 #endif
@@ -87,9 +88,9 @@
 #define DEFAULT_LCD_ALPHA_OFF		20
 
 #define RES_PATH			"./res"
-#define BACKGROUND_PATH			RES_PATH"/background.png"
+#define BACKGROUND_PATH			RES_PATH"/%s-background.png"
 #define SHELL_PATH			RES_PATH"/shell.png"
-#define ICONS_PATH			RES_PATH"/icons.png"
+#define ICONS_PATH			RES_PATH"/%s-icons.png"
 
 #define AUDIO_FREQUENCY			48000
 #define AUDIO_SAMPLES			480 // 10 ms @ 48000 Hz
@@ -115,6 +116,7 @@ static u12_t *g_program = NULL;		// The actual program that is executed
 static uint32_t g_program_size = 0;
 
 static char rom_basename[256] = "";
+static char* rom_type = NULL;
 
 static bool_t memory_editor_enable = 0;
 
@@ -623,6 +625,8 @@ static void sdl_release(void)
 
 static bool_t sdl_init(void)
 {
+	char tmp_path[256];
+
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO) != 0) {
 		hal_log(LOG_ERROR, "Failed to initialize SDL: %s\n", SDL_GetError());
 		return 1;
@@ -640,7 +644,8 @@ static bool_t sdl_init(void)
 
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
-	bg = IMG_LoadTexture(renderer, BACKGROUND_PATH);
+	sprintf(tmp_path, BACKGROUND_PATH, rom_type);
+	bg = IMG_LoadTexture(renderer, tmp_path);
 	if(!bg) {
 		hal_log(LOG_INFO, "Failed to load the background image: %s\n", SDL_GetError());
 	}
@@ -654,7 +659,8 @@ static bool_t sdl_init(void)
 		}
 	}
 
-	icons = IMG_LoadTexture(renderer, ICONS_PATH);
+	sprintf(tmp_path, ICONS_PATH, rom_type);
+	icons = IMG_LoadTexture(renderer, tmp_path);
 	if(!icons) {
 		hal_log(LOG_ERROR, "Failed to load the icons image: %s\n", SDL_GetError());
 		sdl_release();
@@ -704,7 +710,7 @@ static void rom_not_found_msg(void)
 static void set_rom_basename(char *path)
 {
 	char *last_point, *start;
-	char tmp_str[256];;
+	char tmp_str[256];
 
 	strncpy(tmp_str, path, 256);
 	start = basename(tmp_str);
@@ -857,6 +863,10 @@ int main(int argc, char **argv)
 		tamalib_free_bp(&g_breakpoints);
 		rom_not_found_msg();
 		return -1;
+	}
+
+	if (rom_type == NULL) {
+		rom_type = program_detect_type_str(g_program);
 	}
 
 	if (gen_header || extract_sprites || modify_sprites) {
