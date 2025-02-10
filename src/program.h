@@ -26,6 +26,7 @@
 
 typedef enum {
 	ROM_TYPE_P1 = 0,
+	ROM_TYPE_P2 = 1,
 	ROM_TYPE_MAX
 } rom_type_t;
 
