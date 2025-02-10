@@ -1,5 +1,5 @@
 /*
- * TamaTool - A cross-platform Tamagotchi P1 explorer
+ * TamaTool - A Cross-Platform Explorer for First-Gen Tamagotchi
  *
  * Copyright (C) 2021 Jean-Christophe Rona <jc@rona.fr>
  *
