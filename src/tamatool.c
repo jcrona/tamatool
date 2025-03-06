@@ -373,6 +373,9 @@ static void handle_click(int32_t x, int32_t y, uint8_t pressed) {
 			/* Right button */
 			tamalib_set_button(BTN_RIGHT, pressed ? BTN_STATE_PRESSED : BTN_STATE_RELEASED);
 		}
+	} else if (x >= bg_offset_x && x < bg_offset_x + bg_size && y >= bg_offset_y && y < bg_offset_y + bg_size) {
+		/* Tap sensor */
+		tamalib_set_button(BTN_TAP, pressed ? BTN_STATE_PRESSED : BTN_STATE_RELEASED);
 	}
 }
 

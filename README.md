@@ -3,13 +3,13 @@
 
 ## Synopsis
 
-TamaTool is a cross-platform explorer for first-gen Tamagotchi (like P1 and P2) relying on the hardware agnostic Tamagotchi P1 emulation library [TamaLIB](https://github.com/jcrona/tamalib/), and mainly targeting Linux, Windows and MacOS.
+TamaTool is a cross-platform explorer for first-gen Tamagotchi (like P1, P2 and Angel) relying on the hardware agnostic first-gen Tamagotchi emulation library [TamaLIB](https://github.com/jcrona/tamalib/), and mainly targeting Linux, Windows and MacOS.
 
 More than a simple emulator, it is an exploration tool featuring a realtime RAM editor, an ASM debugger, an I/Os monitor and a sprite manipulator, allowing to play around with E0C6S46/8 based Tamagotchi ROMs. It also allows to save and restore its emulation state, thus allowing you to backup and share your best friend !
 
 ![TamaTool](misc/screenshot.png)![TamaTool-Shell](misc/screenshot2.png)
 
-In order to create the background images used in TamaTool, I scanned the background of my own P1 and P2, that I filtered/enhanced using GIMP. The original scans can be found in the __misc__ folder. The shell is also a photo of my P1.
+In order to create the background images used in TamaTool, I scanned the background of my own P1, P2 and Angel, that I filtered/enhanced using GIMP. The original scans can be found in the __misc__ folder. The shell is also a photo of my P1.
 
 __Notes regarding the supported platforms__
 
@@ -109,6 +109,7 @@ $ ./tamatool -h
 ```
 
 Once running, you can either click on the shell buttons to interact with the Tamagotchi, or you can press the __left__, __down__ and __right__ arrow keys of your keyboard.  
+Pressing __SPACE__ or clicking on the screen triggers the vibration sensor (the Angel has one for instance)  
 Pressing __s__ puts the emulation in step by step mode and executes the next instruction, while __r__ resumes it.  
 Pressing __w__ fully executes the next instruction or call (no step by step inside a call).  
 Pressing __x__ stops the execution right after the next call.  

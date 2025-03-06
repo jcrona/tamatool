@@ -44,6 +44,7 @@ static map_t g_map[MAX_SPRITES];
 static char *rom_type_str[] = {
 	[ROM_TYPE_P1] = "p1",
 	[ROM_TYPE_P2] = "p2",
+	[ROM_TYPE_ANGEL] = "angel",
 };
 
 
@@ -304,6 +305,9 @@ rom_type_t program_detect_type(u12_t *program)
 
 		case 0xBB79B1B2:
 			return ROM_TYPE_P2;
+
+		case 0x3CA006E6:
+			return ROM_TYPE_ANGEL;
 
 		default:
 			/* Default is Tamagotchi P1 */
