@@ -44,7 +44,7 @@
 #include "mem_edit.h"
 
 #define APP_NAME			"TamaTool"
-#define APP_VERSION			"0.2" // Major, minor
+#define APP_VERSION			"1.0" // Major, minor
 #define COPYRIGHT_DATE			"2025"
 #define AUTHOR_NAME			"Jean-Christophe Rona"
 
