@@ -51,7 +51,7 @@
 #define ROM_PATH			"rom.bin"
 
 #define ROM_NOT_FOUND_TITLE		"Tamagotchi ROM not found"
-#define ROM_NOT_FOUND_MSG		"You need to place a Tamagotchi P1 ROM called \"rom.bin\" inside TamaTool's folder/package first !"
+#define ROM_NOT_FOUND_MSG		"You need to place a Tamagotchi ROM called \"rom.bin\" inside TamaTool's folder/package first !"
 
 #define REF_BACKGROUND_SIZE		345
 #define REF_BACKGROUND_OFFSET_X		148
