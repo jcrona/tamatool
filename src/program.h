@@ -31,6 +31,8 @@ typedef enum {
 	ROM_TYPE_MAX
 } rom_type_t;
 
+extern char *rom_type_str[ROM_TYPE_MAX];
+
 
 u12_t * program_load(char *path, uint32_t *size);
 void program_save(char *path, u12_t *program, uint32_t size);

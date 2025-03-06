@@ -727,6 +727,8 @@ static void set_rom_basename(char *path)
 
 static void usage(FILE * fp, int argc, char **argv)
 {
+	unsigned int i;
+
 	fprintf(fp,
 		APP_NAME" v"APP_VERSION" - (C)"COPYRIGHT_DATE" "AUTHOR_NAME"\n\n"
 		"Usage: %s [options]\n\n"
@@ -738,7 +740,7 @@ static void usage(FILE * fp, int argc, char **argv)
 		"\t-l | --load <path>            Load the given memory state file (save)\n"
 		"\t-s | --step                   Enable step by step debugging from the start\n"
 		"\t-b | --break <0xXXX>          Add a breakpoint\n"
-		"\t-t | --type <name>            Force type to name (default is auto detect)\n"
+		"\t-t | --type <name>            Force device type to name (default is auto detect)\n"
 		"\t-m | --memory                 Show memory access\n"
 #if !defined(__WIN32__)
 		"\t-e | --editor                 Realtime memory editor\n"
@@ -748,6 +750,15 @@ static void usage(FILE * fp, int argc, char **argv)
 		"\t-v | --verbose                Show all information\n"
 		"\t-h | --help                   Print this message\n",
 		argv[0], ROM_PATH);
+
+	fprintf(fp, "\nAvailable device types:");
+	for (i = 0; i < ROM_TYPE_MAX; i++) {
+		if (i > 0) {
+			fprintf(fp, ",");
+		}
+		fprintf(fp, " %s", rom_type_str[i]);
+	}
+	fprintf(fp, "\n");
 }
 
 static const char short_options[] = "r:E:M:Hl:sb:t:mecivh";

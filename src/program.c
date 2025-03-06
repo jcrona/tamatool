@@ -41,7 +41,7 @@ typedef struct map {
 
 static map_t g_map[MAX_SPRITES];
 
-static char *rom_type_str[] = {
+char *rom_type_str[ROM_TYPE_MAX] = {
 	[ROM_TYPE_P1] = "p1",
 	[ROM_TYPE_P2] = "p2",
 	[ROM_TYPE_ANGEL] = "angel",
